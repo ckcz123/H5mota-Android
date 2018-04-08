@@ -5,6 +5,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.v7.app.AlertDialog;
@@ -17,6 +18,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
 import com.ckcz123.h5mota.lib.CustomToast;
 import com.tencent.smtt.export.external.interfaces.JsPromptResult;
@@ -37,6 +39,7 @@ public class TBSActivity extends AppCompatActivity {
 
     WebView webView;
     TBSActivity activity;
+    ProgressBar progressBar;
 
     private ValueCallback<Uri> mUploadMessage;
     public ValueCallback<Uri[]> uploadMessage;
@@ -48,16 +51,22 @@ public class TBSActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         activity=this;
 
-        webView=new WebView(this);
-        setContentView(webView, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+        //webView=new WebView(this);
+        //setContentView(webView, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+        setContentView(R.layout.activity_tbs);
+
+        webView=findViewById(R.id.webview);
+        progressBar=findViewById(R.id.progressBar);
+
+        progressBar.setVisibility(View.VISIBLE);
 
         setTitle(getIntent().getStringExtra("title"));
 
         final WebSettings webSettings=webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
-        webSettings.setSupportZoom(false);
-        webSettings.setUseWideViewPort(false);
+        webSettings.setSupportZoom(true);
+        webSettings.setUseWideViewPort(true);
         webSettings.setLoadWithOverviewMode(true);
         webSettings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
         webView.setScrollBarStyle(View.SCROLLBARS_OUTSIDE_INSET);
@@ -70,8 +79,13 @@ public class TBSActivity extends AppCompatActivity {
                 webView.loadUrl(url);
                 return true;
             }
+            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                super.onPageStarted(view, url, favicon);
+                progressBar.setVisibility(View.VISIBLE);
+            }
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
+                progressBar.setVisibility(View.GONE);
                 activity.setTitle(webView.getTitle());
             }
             public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
@@ -169,10 +183,13 @@ public class TBSActivity extends AppCompatActivity {
                 } catch (ActivityNotFoundException e)
                 {
                     uploadMessage = null;
-                    //CustomToast.showErrorToast(activity, "无法打开文件");
                     return false;
                 }
                 return true;
+            }
+
+            public void onProgressChanged(WebView view, int progress) {
+                progressBar.setProgress(progress);
             }
 
         });
@@ -216,6 +233,7 @@ public class TBSActivity extends AppCompatActivity {
                 webView.goBack();
             }
             else {
+                webView.loadUrl("about:blank");
                 finish();
             }
             return true;
@@ -243,6 +261,11 @@ public class TBSActivity extends AppCompatActivity {
         }
     }
 
+    public void onDestroy() {
+        webView.destroy();
+        super.onDestroy();
+    }
+
     public boolean onCreateOptionsMenu(Menu menu) {
         return super.onCreateOptionsMenu(menu);
     }
@@ -256,7 +279,7 @@ public class TBSActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         super.onOptionsItemSelected(item);
         switch (item.getItemId()) {
-            case 0: finish();break;
+            case 0: webView.loadUrl("about:blank");finish();break;
         }
         return true;
     }

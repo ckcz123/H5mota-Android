@@ -6,8 +6,8 @@ android {
         applicationId "com.ckcz123.h5mota"
         minSdkVersion 19
         targetSdkVersion 26
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         ndk{abiFilters "armeabi"}
     }
@@ -36,4 +36,5 @@ dependencies {
     implementation files('libs/tbs.jar')
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
     implementation 'org.nanohttpd:nanohttpd-webserver:2.3.1'
+    compile 'me.weyye.hipermission:library:1.0.7'
 }
