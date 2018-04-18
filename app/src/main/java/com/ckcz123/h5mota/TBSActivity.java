@@ -2,6 +2,7 @@ package com.ckcz123.h5mota;
 
 import android.app.DownloadManager;
 import android.content.ActivityNotFoundException;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,6 +12,7 @@ import android.os.Environment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,7 +35,10 @@ import com.tencent.smtt.sdk.WebSettings;
 import com.tencent.smtt.sdk.WebView;
 import com.tencent.smtt.sdk.WebViewClient;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public class TBSActivity extends AppCompatActivity {
 
@@ -44,6 +49,7 @@ public class TBSActivity extends AppCompatActivity {
     private ValueCallback<Uri> mUploadMessage;
     public ValueCallback<Uri[]> uploadMessage;
     public static final int REQUEST_SELECT_FILE = 100;
+    public static final int JSINTERFACE_SELECT_FILE = 200;
     private final static int FILECHOOSER_RESULTCODE = 2;
 
     @Override
@@ -73,6 +79,8 @@ public class TBSActivity extends AppCompatActivity {
         webSettings.setAllowContentAccess(true);
         webSettings.setDefaultTextEncodingName("utf-8");
         webSettings.setDomStorageEnabled(true);
+
+        webView.addJavascriptInterface(new JSInterface(this, webView), "jsinterface");
 
         webView.setWebViewClient(new WebViewClient() {
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -241,9 +249,10 @@ public class TBSActivity extends AppCompatActivity {
         return false;
     }
 
-    protected void onActivityResult(int requestCode, int resultCode,
-                                    Intent intent) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
         if (resultCode==RESULT_OK) {
+            Uri result = intent == null? null: intent.getData();
             switch (requestCode) {
                 case REQUEST_SELECT_FILE:
                     if (uploadMessage == null)
@@ -253,10 +262,24 @@ public class TBSActivity extends AppCompatActivity {
                     return;
                 case FILECHOOSER_RESULTCODE:
                     if (null == mUploadMessage) return;
-                    Uri result = intent == null ? null : intent.getData();
                     mUploadMessage.onReceiveValue(result);
                     mUploadMessage = null;
                     break;
+                case JSINTERFACE_SELECT_FILE:
+                    if (result == null) break;
+                    Log.i("Path", result.getPath());
+                    try (InputStream inputStream = getContentResolver().openInputStream(result);
+                         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+                        String line;
+                        StringBuilder builder = new StringBuilder();
+                        while ((line=reader.readLine())!=null) builder.append(line);
+                        webView.loadUrl("javascript:core.readFileContent('" + builder.toString().replace('\'', '\"') +"')");
+                    }
+                    catch (Exception e) {
+                        CustomToast.showErrorToast(this, "读取失败！");
+                        e.printStackTrace();
+                    }
+
             }
         }
     }
