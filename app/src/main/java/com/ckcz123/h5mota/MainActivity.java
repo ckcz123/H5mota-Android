@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.ckcz123.h5mota.lib.CustomToast;
 import com.ckcz123.h5mota.lib.HttpRequest;
+import com.ckcz123.h5mota.lib.MyWebServer;
 import com.ckcz123.h5mota.lib.Utils;
 import com.tencent.smtt.sdk.QbSdk;
 
@@ -179,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
             if (simpleWebServer!=null) {
                 simpleWebServer.stop();
             }
-            simpleWebServer = new SimpleWebServer("127.0.0.1", 1055, directory, true);
+            simpleWebServer = new MyWebServer("127.0.0.1", 1055, directory, true);
             simpleWebServer.start();
         }
         catch (Exception e) {
