@@ -77,7 +77,7 @@ public class Utils {
 
             return true;
         }
-        catch (IOException e) {
+        catch (Exception e) {
             Log.e("unzip", "error", e);
             return false;
         }
