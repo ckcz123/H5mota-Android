@@ -208,6 +208,8 @@ public class TBSActivity extends AppCompatActivity {
                 try {
                     DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
 
+                    Log.i("mimetype", mimetype);
+
                     request.setMimeType(mimetype);
                     request.allowScanningByMediaScanner();
                     request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
