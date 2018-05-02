@@ -51,7 +51,7 @@
                     android:layout_centerHorizontal="true"
                     android:layout_centerVertical="true"
                     android:lineSpacingMultiplier="1.2"
-                    android:text="点击访问mota.pw即可享受所有H5在线游戏\nHTML5魔塔交流群：539113091"
+                    android:text="点击访问h5mota.com即可享受所有H5在线游戏\nHTML5魔塔交流群：539113091"
                     android:textSize="15sp"/>
 
             </RelativeLayout>

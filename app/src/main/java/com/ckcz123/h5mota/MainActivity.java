@@ -42,6 +42,8 @@ import me.weyye.hipermission.PermissionItem;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final String DOMAIN = "https://h5mota.com";
+
     SimpleWebServer simpleWebServer;
 
     @Override
@@ -95,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent=new Intent(MainActivity.this, TBSActivity.class);
                 intent.putExtra("title", "HTML5魔塔列表");
-                intent.putExtra("url", "http://mota.pw/");
+                intent.putExtra("url", DOMAIN);
                 startActivity(intent);
             }
         });
@@ -115,7 +117,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    HttpRequest httpRequest=HttpRequest.get("https://ckcz123.com/games/_client/").useCaches(false);
+                    HttpRequest httpRequest=HttpRequest.get(DOMAIN+"/games/_client/")
+                            .followRedirects(true).useCaches(false);
                     String s=httpRequest.body();
                     httpRequest.disconnect();
                     JSONObject jsonObject=new JSONObject(s);
