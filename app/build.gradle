@@ -6,8 +6,8 @@ android {
         applicationId "com.ckcz123.h5mota"
         minSdkVersion 19
         targetSdkVersion 26
-        versionCode 10
-        versionName "1.5"
+        versionCode 12
+        versionName "1.6"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         ndk{abiFilters "armeabi"}
     }

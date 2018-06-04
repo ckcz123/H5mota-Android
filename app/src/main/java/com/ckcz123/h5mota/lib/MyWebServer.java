@@ -2,6 +2,8 @@ package com.ckcz123.h5mota.lib;
 
 import android.util.Log;
 
+import com.ckcz123.h5mota.MainActivity;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -40,7 +42,7 @@ public class MyWebServer extends SimpleWebServer{
             }
 
             try {
-                HttpRequest request = HttpRequest.post("https://ckcz123.com"+path)
+                HttpRequest request = HttpRequest.post(MainActivity.DOMAIN+path)
                         .acceptJson()
                         .form(keyValue);
 
