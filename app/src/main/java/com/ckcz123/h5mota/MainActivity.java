@@ -10,10 +10,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
@@ -43,6 +46,8 @@ import me.weyye.hipermission.PermissionItem;
 public class MainActivity extends AppCompatActivity {
 
     public static final String DOMAIN = "https://h5mota.com";
+    public static final String LOCAL = "http://127.0.0.1:1055/";
+    public File directory;
 
     SimpleWebServer simpleWebServer;
 
@@ -95,10 +100,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.online).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent=new Intent(MainActivity.this, TBSActivity.class);
-                intent.putExtra("title", "HTML5魔塔列表");
-                intent.putExtra("url", DOMAIN);
-                startActivity(intent);
+                loadUrl(DOMAIN, "HTML5魔塔列表");
             }
         });
 
@@ -135,10 +137,7 @@ public class MainActivity extends AppCompatActivity {
                                                 @Override
                                                 public void onClick(DialogInterface dialogInterface, int i) {
                                                     try {
-                                                        Intent intent=new Intent(MainActivity.this, TBSActivity.class);
-                                                        intent.putExtra("title", "版本更新");
-                                                        intent.putExtra("url", android.getString("url"));
-                                                        startActivity(intent);
+                                                        loadUrl(android.getString("url"), "版本更新");
                                                     }
                                                     catch (Exception e) {
                                                         e.printStackTrace();
@@ -167,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
         if (!HiPermission.checkPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE))
             return;
 
-        final File directory = new File(Environment.getExternalStorageDirectory()+"/H5mota/");
+        directory = new File(Environment.getExternalStorageDirectory()+"/H5mota/");
 
         if (!directory.exists()) {
             directory.mkdirs();
@@ -211,10 +210,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         try {
                             String name=names.get(i);
-                            Intent intent=new Intent(MainActivity.this, TBSActivity.class);
-                            intent.putExtra("title", name);
-                            intent.putExtra("url", "http://127.0.0.1:1055/"+ URLEncoder.encode(name, "utf-8"));
-                            startActivity(intent);
+                            loadUrl(LOCAL+ URLEncoder.encode(name, "utf-8"), name);
                         }
                         catch (Exception e) {
                             e.printStackTrace();
@@ -251,4 +247,75 @@ public class MainActivity extends AppCompatActivity {
         }
         return false;
     }
+
+
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.clear();
+        menu.add(Menu.NONE, 0, 0, "").setIcon(android.R.drawable.ic_menu_set_as).setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        menu.add(Menu.NONE, 1, 1, "").setIcon(android.R.drawable.ic_menu_delete).setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        menu.add(Menu.NONE, 2, 2, "").setIcon(android.R.drawable.ic_menu_close_clear_cancel).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        super.onOptionsItemSelected(item);
+        switch (item.getItemId()) {
+            case 0: inputLink();break;
+            case 1: {
+                new AlertDialog.Builder(this).setItems(new String[]{"清理在线垃圾存档","清理离线垃圾存档"}, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        if (i==0) {
+                            loadUrl(DOMAIN+"/clearStorage.php", "清理在线垃圾存档");
+                        }
+                        else if (i==1) {
+                            File clearFile = new File(directory, "clearStorage.html");
+                            if (!clearFile.exists()) {
+                                Utils.copyFilesFassets(MainActivity.this, "clearStorage.html", directory+"/clearStorage.html");
+                            }
+                            loadUrl(LOCAL+"clearStorage.html", "清理离线垃圾存档");
+                        }
+                    }
+                }).setTitle("垃圾存档清理工具").setCancelable(true).create().show();
+                break;
+            }
+            case 2: finish();break;
+        }
+        return true;
+    }
+
+    public void loadUrl(String url, String title) {
+        try {
+            Intent intent=new Intent(MainActivity.this, TBSActivity.class);
+            intent.putExtra("title", title);
+            intent.putExtra("url", url);
+            startActivity(intent);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            CustomToast.showErrorToast(this, "无法打开网页！");
+        }
+    }
+
+    private void inputLink() {
+        final EditText editText = new EditText(this);
+        editText.setHint("请输入地址...");
+        new AlertDialog.Builder(this).setTitle("浏览网页")
+                .setView(editText).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                String url = editText.getEditableText().toString();
+                if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                    url = "http://"+url;
+                }
+                loadUrl(url, "浏览网页");
+            }
+        }).setNegativeButton("取消", null).setCancelable(true).create().show();
+    }
+
 }

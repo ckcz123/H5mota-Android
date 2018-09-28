@@ -23,6 +23,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.ckcz123.h5mota.lib.CustomToast;
+import com.ckcz123.h5mota.lib.Utils;
 import com.tencent.smtt.export.external.interfaces.JsPromptResult;
 import com.tencent.smtt.export.external.interfaces.JsResult;
 import com.tencent.smtt.export.external.interfaces.SslError;
@@ -297,14 +298,36 @@ public class TBSActivity extends AppCompatActivity {
 
     public boolean onPrepareOptionsMenu(Menu menu) {
         menu.clear();
-        menu.add(Menu.NONE, 0, 0, "").setIcon(android.R.drawable.ic_menu_close_clear_cancel).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        menu.add(Menu.NONE, 0, 0, "").setIcon(android.R.drawable.ic_menu_rotate).setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        menu.add(Menu.NONE, 1, 1, "").setIcon(android.R.drawable.ic_menu_delete).setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        menu.add(Menu.NONE, 2, 2, "").setIcon(android.R.drawable.ic_menu_close_clear_cancel).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         return true;
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
         super.onOptionsItemSelected(item);
         switch (item.getItemId()) {
-            case 0: webView.loadUrl("about:blank");finish();break;
+            case 0: webView.clearCache(true); webView.reload(); break;
+            case 1: {
+                new AlertDialog.Builder(this).setItems(new String[]{"清理在线垃圾存档","清理离线垃圾存档"}, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        if (i==0) {
+                            webView.loadUrl(MainActivity.DOMAIN+"/clearStorage.php");
+                        }
+                        else if (i==1) {
+                            File directory = new File(Environment.getExternalStorageDirectory()+"/H5mota/");
+                            File clearFile = new File(directory, "clearStorage.html");
+                            if (!clearFile.exists()) {
+                                Utils.copyFilesFassets(TBSActivity.this, "clearStorage.html", directory+"/clearStorage.html");
+                            }
+                            webView.loadUrl(MainActivity.LOCAL+"clearStorage.html");
+                        }
+                    }
+                }).setTitle("垃圾存档清理工具").setCancelable(true).create().show();
+                break;
+            }
+            case 2: webView.loadUrl("about:blank");finish();break;
         }
         return true;
     }
