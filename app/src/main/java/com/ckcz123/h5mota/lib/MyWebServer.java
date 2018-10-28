@@ -22,10 +22,15 @@ public class MyWebServer extends SimpleWebServer{
         super(host, port, wwwroot, quiet);
     }
 
+    public boolean shouldRedirect(String path) {
+        // 只有"存档同步"才会上传服务器
+        return path.equals("/games/sync.php");
+    }
+
     @Override
     public Response serve(IHTTPSession session) {
         String path = session.getUri();
-        if (session.getMethod() == Method.POST && path.startsWith("/")) {
+        if (session.getMethod() == Method.POST && shouldRedirect(path)) {
 
             try {
                 session.parseBody(new HashMap<String, String>());
