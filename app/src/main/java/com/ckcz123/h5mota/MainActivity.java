@@ -281,7 +281,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void loadUrl(String url, String title) {
         try {
-            Intent intent=new Intent(MainActivity.this, TBSActivity.class);
+            Intent intent=new Intent(MainActivity.this, WebActivity.class);
             intent.putExtra("title", title);
             intent.putExtra("url", url);
             startActivity(intent);

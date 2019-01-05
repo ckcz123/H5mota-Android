@@ -27,12 +27,10 @@ import me.weyye.hipermission.HiPermission;
 
 public class JSInterface {
 
-    Activity activity;
-    WebView webView;
+    private Activity activity;
 
-    public JSInterface(Activity activity, WebView webView) {
+    public JSInterface(Activity activity) {
         this.activity = activity;
-        this.webView = webView;
     }
 
     @JavascriptInterface
@@ -70,7 +68,6 @@ public class JSInterface {
         }
         catch (IOException e) {
             CustomToast.showErrorToast(activity, "下载失败！");
-            return;
         }
 
     }
