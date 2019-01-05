@@ -97,7 +97,6 @@ public class WebActivity extends AppCompatActivity {
         webSettings.setRenderPriority(WebSettings.RenderPriority.HIGH);
         webSettings.setLoadsImagesAutomatically(true);
         webSettings.setAppCacheEnabled(true);
-        webSettings.setOffscreenPreRaster(true);
 
         webView.addJavascriptInterface(new JSInterface(this), "jsinterface");
 
