@@ -14,7 +14,6 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.webkit.JavascriptInterface;
 
 import com.ckcz123.h5mota.lib.CustomToast;
-import com.tencent.smtt.sdk.WebView;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -86,7 +85,7 @@ public class JSInterface {
 
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("*/*");
-        activity.startActivityForResult(Intent.createChooser(intent, "请选择文件"), TBSActivity.JSINTERFACE_SELECT_FILE);
+        activity.startActivityForResult(Intent.createChooser(intent, "请选择文件"), WebActivity.JSINTERFACE_SELECT_FILE);
 
     }
 

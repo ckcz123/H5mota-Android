@@ -26,9 +26,8 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".TBSActivity"/>
         <activity android:name=".WebActivity"
-            android:hardwareAccelerated="false"/>
+                  android:hardwareAccelerated="true"/>
         <receiver android:name="com.ckcz123.h5mota.DownloadReceiver" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.DOWNLOAD_COMPLETE"/>

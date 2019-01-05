@@ -78,6 +78,12 @@ public class WebActivity extends AppCompatActivity {
         webSettings.setAllowContentAccess(true);
         webSettings.setDefaultTextEncodingName("utf-8");
         webSettings.setDomStorageEnabled(true);
+        webSettings.setMediaPlaybackRequiresUserGesture(false);
+        webSettings.setDatabaseEnabled(true);
+        webSettings.setRenderPriority(WebSettings.RenderPriority.HIGH);
+        webSettings.setLoadsImagesAutomatically(true);
+        webSettings.setAppCacheEnabled(true);
+        webSettings.setOffscreenPreRaster(true);
 
         webView.addJavascriptInterface(new JSInterface(this), "jsinterface");
 

@@ -19,7 +19,6 @@ import com.ckcz123.h5mota.lib.CustomToast;
 import com.ckcz123.h5mota.lib.HttpRequest;
 import com.ckcz123.h5mota.lib.MyWebServer;
 import com.ckcz123.h5mota.lib.Utils;
-import com.tencent.smtt.sdk.QbSdk;
 
 import org.json.JSONObject;
 
@@ -72,18 +71,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onGuarantee(String permission, int position) {
                 Log.i("Main", "onGuarantee");
-            }
-        });
-
-        QbSdk.initX5Environment(this, new QbSdk.PreInitCallback() {
-            @Override
-            public void onCoreInitFinished() {
-
-            }
-
-            @Override
-            public void onViewInitFinished(boolean b) {
-                Log.e("@@","加载内核是否成功:"+b);
             }
         });
 
