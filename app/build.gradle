@@ -4,7 +4,7 @@ android {
     compileSdkVersion 26
     defaultConfig {
         applicationId "com.ckcz123.h5mota"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 26
         versionCode 20
         versionName "1.8"
@@ -37,4 +37,6 @@ dependencies {
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
     implementation 'org.nanohttpd:nanohttpd-webserver:2.3.1'
     compile 'me.weyye.hipermission:library:1.0.7'
+    //Bugly support
+    compile 'com.tencent.bugly:crashreport:latest.release'
 }

@@ -3,22 +3,16 @@ package com.ckcz123.h5mota;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import com.ckcz123.h5mota.lib.CustomToast;
@@ -27,18 +21,14 @@ import com.ckcz123.h5mota.lib.MyWebServer;
 import com.ckcz123.h5mota.lib.Utils;
 import com.tencent.smtt.sdk.QbSdk;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.net.HttpURLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import fi.iki.elonen.SimpleWebServer;
-import fi.iki.elonen.util.ServerRunner;
 import me.weyye.hipermission.HiPermission;
 import me.weyye.hipermission.PermissionCallback;
 import me.weyye.hipermission.PermissionItem;
@@ -291,7 +281,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void loadUrl(String url, String title) {
         try {
-            Intent intent=new Intent(MainActivity.this, TBSActivity.class);
+            Intent intent=new Intent(MainActivity.this, WebActivity.class);
             intent.putExtra("title", title);
             intent.putExtra("url", url);
             startActivity(intent);

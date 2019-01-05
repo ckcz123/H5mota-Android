@@ -4,16 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.ckcz123.h5mota.TBSActivity">
+    tools:context="com.ckcz123.h5mota.WebActivity">
 
-
-    <com.tencent.smtt.sdk.WebView
+    <WebView
         android:id="@+id/webview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="visible">
-    </com.tencent.smtt.sdk.WebView>
-
+        android:layout_height="match_parent"/>
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -25,6 +21,5 @@
         android:layout_marginTop="-6dp"
         android:indeterminate="false"
         android:max="100"/>
-
 
 </RelativeLayout>
