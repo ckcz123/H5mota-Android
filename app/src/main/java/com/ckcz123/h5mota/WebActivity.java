@@ -18,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.webkit.ConsoleMessage;
 import android.webkit.DownloadListener;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
@@ -35,9 +36,16 @@ import com.ckcz123.h5mota.lib.CustomToast;
 import com.ckcz123.h5mota.lib.Utils;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by castor_v_pollux on 2018/12/30.
@@ -54,10 +62,16 @@ public class WebActivity extends AppCompatActivity {
     public static final int JSINTERFACE_SELECT_FILE = 200;
     private final static int FILECHOOSER_RESULTCODE = 2;
 
+    private File LOG_FILE;
+    private SimpleDateFormat simpleDateFormat;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web);
+
+        LOG_FILE = new File(Environment.getExternalStorageDirectory()+"/H5mota/", "log.txt");
+        simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
 
         setTitle(getIntent().getStringExtra("title"));
 
@@ -204,6 +218,24 @@ public class WebActivity extends AppCompatActivity {
 
             public void onProgressChanged(WebView view, int progress) {
                 progressBar.setProgress(progress);
+            }
+
+            public boolean onConsoleMessage(ConsoleMessage message) {
+                String msg = message.message();
+                if (msg.equals("[object Object]") || msg.equals("localForage supported!") || msg.equals("插件编写测试") || msg.equals("开始游戏"))
+                    return false;
+                ConsoleMessage.MessageLevel level = message.messageLevel();
+                if (level != ConsoleMessage.MessageLevel.LOG && level != ConsoleMessage.MessageLevel.ERROR)
+                    return false;
+                try (PrintWriter printWriter = new PrintWriter(new FileWriter(LOG_FILE, true))){
+                    String s = String.format("[%s] {%s, Line %s, Source %s} %s\r\n", simpleDateFormat.format(new Date()),
+                            level.toString(), message.lineNumber(), message.sourceId(), msg);
+                    printWriter.write(s);
+                }
+                catch (Exception e) {
+                    Log.i("Console", "error", e);
+                }
+                return false;
             }
         });
         webView.setDownloadListener(new DownloadListener() {
