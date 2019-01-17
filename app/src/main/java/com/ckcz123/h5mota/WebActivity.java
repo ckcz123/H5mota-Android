@@ -70,7 +70,14 @@ public class WebActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web);
 
-        LOG_FILE = new File(Environment.getExternalStorageDirectory()+"/H5mota/", "log.txt");
+        File log_dir = new File(Environment.getExternalStorageDirectory()+"/H5mota/", ".logs");
+        if (!log_dir.exists() && !log_dir.mkdirs()) {
+            LOG_FILE = null;
+        }
+        else {
+            LOG_FILE = new File(log_dir, "log-"+
+                    new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date())+".txt");
+        }
         simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
 
         setTitle(getIntent().getStringExtra("title"));
@@ -220,6 +227,7 @@ public class WebActivity extends AppCompatActivity {
             }
 
             public boolean onConsoleMessage(ConsoleMessage message) {
+                if (LOG_FILE == null) return false;
                 String msg = message.message();
                 if (msg.equals("[object Object]") || msg.equals("localForage supported!") || msg.equals("插件编写测试") || msg.equals("开始游戏"))
                     return false;
