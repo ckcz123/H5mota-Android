@@ -16,11 +16,13 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 
 import com.ckcz123.h5mota.lib.CustomToast;
 import com.ckcz123.h5mota.lib.Utils;
+import com.tencent.smtt.export.external.interfaces.ConsoleMessage;
 import com.tencent.smtt.export.external.interfaces.JsPromptResult;
 import com.tencent.smtt.export.external.interfaces.JsResult;
 import com.tencent.smtt.export.external.interfaces.SslError;
@@ -35,8 +37,13 @@ import com.tencent.smtt.sdk.WebViewClient;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class TBSActivity extends AppCompatActivity {
 
@@ -50,6 +57,9 @@ public class TBSActivity extends AppCompatActivity {
     public static final int JSINTERFACE_SELECT_FILE = 200;
     private final static int FILECHOOSER_RESULTCODE = 2;
 
+    private File LOG_FILE;
+    private SimpleDateFormat simpleDateFormat;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +69,18 @@ public class TBSActivity extends AppCompatActivity {
         //setContentView(webView, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
         setContentView(R.layout.activity_tbs);
 
+        File log_dir = new File(Environment.getExternalStorageDirectory()+"/H5mota/", ".logs");
+        if (!log_dir.exists() && !log_dir.mkdirs()) {
+            LOG_FILE = null;
+        }
+        else {
+            LOG_FILE = new File(log_dir, "log-"+
+                    new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date())+".txt");
+        }
+        simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,  WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
+
         webView=findViewById(R.id.webview);
         progressBar=findViewById(R.id.progressBar);
 
@@ -66,7 +88,7 @@ public class TBSActivity extends AppCompatActivity {
 
         setTitle(getIntent().getStringExtra("title"));
 
-        final WebSettings webSettings=webView.getSettings();
+        WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
         webSettings.setSupportZoom(true);
@@ -77,6 +99,11 @@ public class TBSActivity extends AppCompatActivity {
         webSettings.setAllowContentAccess(true);
         webSettings.setDefaultTextEncodingName("utf-8");
         webSettings.setDomStorageEnabled(true);
+        webSettings.setMediaPlaybackRequiresUserGesture(false);
+        webSettings.setDatabaseEnabled(true);
+        webSettings.setRenderPriority(WebSettings.RenderPriority.HIGH);
+        webSettings.setLoadsImagesAutomatically(true);
+        webSettings.setAppCacheEnabled(true);
 
         webView.addJavascriptInterface(new JSInterface(this, webView), "jsinterface");
 
@@ -198,6 +225,25 @@ public class TBSActivity extends AppCompatActivity {
                 progressBar.setProgress(progress);
             }
 
+            public boolean onConsoleMessage(ConsoleMessage message) {
+                if (LOG_FILE == null) return false;
+                String msg = message.message();
+                if (msg.equals("[object Object]") || msg.equals("localForage supported!") || msg.equals("插件编写测试") || msg.equals("开始游戏"))
+                    return false;
+                ConsoleMessage.MessageLevel level = message.messageLevel();
+                if (level != ConsoleMessage.MessageLevel.LOG && level != ConsoleMessage.MessageLevel.ERROR)
+                    return false;
+                try (PrintWriter printWriter = new PrintWriter(new FileWriter(LOG_FILE, true))){
+                    String s = String.format("[%s] {%s, Line %s, Source %s} %s\r\n", simpleDateFormat.format(new Date()),
+                            level.toString(), message.lineNumber(), message.sourceId(), msg);
+                    printWriter.write(s);
+                }
+                catch (Exception e) {
+                    Log.i("Console", "error", e);
+                }
+                return false;
+            }
+
         });
 
         webView.setDownloadListener(new DownloadListener() {
@@ -273,7 +319,7 @@ public class TBSActivity extends AppCompatActivity {
                         String line;
                         StringBuilder builder = new StringBuilder();
                         while ((line=reader.readLine())!=null) builder.append(line);
-                        webView.loadUrl("javascript:core.readFileContent('" + builder.toString().replace('\'', '\"') +"')");
+                        webView.evaluateJavascript("core.readFileContent('" + builder.toString().replace('\'', '\"') +"')", null);
                     }
                     catch (Exception e) {
                         CustomToast.showErrorToast(this, "读取失败！");
