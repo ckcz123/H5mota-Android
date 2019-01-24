@@ -73,6 +73,9 @@ public class DownloadReceiver extends BroadcastReceiver {
                             CustomToast.showErrorToast(context, "无法自动安装更新包，请手动进行安装。");
                         }
                     }
+                    else {
+                        CustomToast.showSuccessToast(context, name + " 已经成功下载到 SD卡/H5mota 目录下！", 6000);
+                    }
                 }
             }
         }

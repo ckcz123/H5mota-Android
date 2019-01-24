@@ -315,7 +315,7 @@ public class WebActivity extends AppCompatActivity {
                         String line;
                         StringBuilder builder = new StringBuilder();
                         while ((line = reader.readLine()) != null) builder.append(line);
-                        webView.loadUrl("javascript:core.readFileContent('" + builder.toString().replace('\'', '\"') + "')");
+                        webView.evaluateJavascript("core.readFileContent('" + builder.toString().replace('\'', '\"') + "')", null);
                     } catch (Exception e) {
                         CustomToast.showErrorToast(this, "读取失败！");
                         e.printStackTrace();
