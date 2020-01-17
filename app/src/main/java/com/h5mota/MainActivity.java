@@ -1,4 +1,4 @@
-package com.ckcz123.h5mota;
+package com.h5mota;
 
 import android.Manifest;
 import android.content.DialogInterface;
@@ -15,10 +15,12 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.ckcz123.h5mota.lib.CustomToast;
-import com.ckcz123.h5mota.lib.HttpRequest;
-import com.ckcz123.h5mota.lib.MyWebServer;
-import com.ckcz123.h5mota.lib.Utils;
+import com.h5mota.BuildConfig;
+import com.h5mota.R;
+import com.h5mota.lib.CustomToast;
+import com.h5mota.lib.HttpRequest;
+import com.h5mota.lib.MyWebServer;
+import com.h5mota.lib.Utils;
 
 import org.json.JSONObject;
 

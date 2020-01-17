@@ -1,4 +1,4 @@
-package com.ckcz123.h5mota.lib;
+package com.h5mota.lib;
 
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_CREATED;

@@ -1,4 +1,4 @@
-package com.ckcz123.h5mota;
+package com.h5mota;
 
 import android.app.Application;
 

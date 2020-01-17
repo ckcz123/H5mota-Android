@@ -1,4 +1,4 @@
-package com.ckcz123.h5mota.lib;
+package com.h5mota.lib;
 
 import android.app.Activity;
 import android.app.Dialog;

@@ -1,4 +1,4 @@
-package com.ckcz123.h5mota;
+package com.h5mota;
 
 import android.Manifest;
 import android.app.Activity;
@@ -13,7 +13,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.webkit.JavascriptInterface;
 
-import com.ckcz123.h5mota.lib.CustomToast;
+import com.h5mota.lib.CustomToast;
 
 import java.io.FileWriter;
 import java.io.IOException;

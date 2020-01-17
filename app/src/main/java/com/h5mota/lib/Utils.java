@@ -1,4 +1,4 @@
-package com.ckcz123.h5mota.lib;
+package com.h5mota.lib;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -9,11 +9,9 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 /**

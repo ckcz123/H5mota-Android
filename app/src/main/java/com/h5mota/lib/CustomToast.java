@@ -1,4 +1,4 @@
-package com.ckcz123.h5mota.lib;
+package com.h5mota.lib;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -9,7 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
 
-import com.ckcz123.h5mota.R;
+import com.h5mota.R;
 
 public class CustomToast {
 

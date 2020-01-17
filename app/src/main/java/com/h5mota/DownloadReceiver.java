@@ -1,4 +1,4 @@
-package com.ckcz123.h5mota;
+package com.h5mota;
 
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
@@ -10,8 +10,9 @@ import android.os.Build;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
 
-import com.ckcz123.h5mota.lib.CustomToast;
-import com.ckcz123.h5mota.lib.Utils;
+import com.h5mota.BuildConfig;
+import com.h5mota.lib.CustomToast;
+import com.h5mota.lib.Utils;
 
 import java.io.File;
 

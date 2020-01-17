@@ -1,4 +1,4 @@
-package com.ckcz123.h5mota;
+package com.h5mota;
 
 import android.app.DownloadManager;
 import android.content.ActivityNotFoundException;
@@ -32,17 +32,16 @@ import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 
-import com.ckcz123.h5mota.lib.CustomToast;
-import com.ckcz123.h5mota.lib.Utils;
+import com.h5mota.R;
+import com.h5mota.lib.CustomToast;
+import com.h5mota.lib.Utils;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;

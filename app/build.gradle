@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 26
     defaultConfig {
-        applicationId "com.ckcz123.h5mota"
+        applicationId "com.h5mota"
         minSdkVersion 19
         targetSdkVersion 26
         versionCode 25

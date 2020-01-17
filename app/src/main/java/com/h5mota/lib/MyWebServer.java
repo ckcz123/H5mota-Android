@@ -1,8 +1,8 @@
-package com.ckcz123.h5mota.lib;
+package com.h5mota.lib;
 
 import android.util.Log;
 
-import com.ckcz123.h5mota.MainActivity;
+import com.h5mota.MainActivity;
 
 import java.io.File;
 import java.io.IOException;
