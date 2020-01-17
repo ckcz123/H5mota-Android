@@ -32,8 +32,8 @@ import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 
-import com.h5mota.R;
-import com.h5mota.lib.CustomToast;
+import com.h5mota.lib.Constants;
+import com.h5mota.lib.view.CustomToast;
 import com.h5mota.lib.Utils;
 
 import java.io.BufferedReader;
@@ -353,14 +353,14 @@ public class WebActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         if (i == 0) {
-                            webView.loadUrl(MainActivity.DOMAIN + "/clearStorage.php");
+                            webView.loadUrl(Constants.DOMAIN + "/clearStorage.php");
                         } else if (i == 1) {
                             File directory = new File(Environment.getExternalStorageDirectory() + "/H5mota/");
                             File clearFile = new File(directory, "clearStorage.html");
                             if (!clearFile.exists()) {
                                 Utils.copyFilesFassets(WebActivity.this, "clearStorage.html", directory + "/clearStorage.html");
                             }
-                            webView.loadUrl(MainActivity.LOCAL + "clearStorage.html");
+                            webView.loadUrl(Constants.LOCAL + "clearStorage.html");
                         }
                     }
                 }).setTitle("垃圾存档清理工具").setCancelable(true).create().show();

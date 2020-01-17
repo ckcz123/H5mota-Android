@@ -10,8 +10,7 @@ import android.os.Build;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
 
-import com.h5mota.BuildConfig;
-import com.h5mota.lib.CustomToast;
+import com.h5mota.lib.view.CustomToast;
 import com.h5mota.lib.Utils;
 
 import java.io.File;

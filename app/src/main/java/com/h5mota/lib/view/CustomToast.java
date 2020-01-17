@@ -1,4 +1,4 @@
-package com.h5mota.lib;
+package com.h5mota.lib.view;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.h5mota.R;
+import com.h5mota.lib.ViewSetting;
 
 public class CustomToast {
 

@@ -11,6 +11,11 @@ import java.util.List;
 import java.util.Map;
 
 import fi.iki.elonen.SimpleWebServer;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 /**
  * Created by oc on 2018/4/24.
@@ -33,33 +38,29 @@ public class MyWebServer extends SimpleWebServer{
         if (session.getMethod() == Method.POST && shouldRedirect(path)) {
 
             try {
-                session.parseBody(new HashMap<String, String>());
+                session.parseBody(new HashMap<>());
             }
             catch (ResponseException | IOException e) {
                 Log.e("Parse Body", "error", e);
             }
 
-            Map<String, List<String>> map = session.getParameters();
+            OkHttpClient okHttpClient = new OkHttpClient()
+                .newBuilder().cookieJar(Cookies.getInstance()).build();
+            FormBody.Builder formBody = new FormBody.Builder();
 
-            Map<String, String> keyValue = new HashMap<>();
+            Map<String, List<String>> map = session.getParameters();
             for (Map.Entry<String, List<String>> entry: map.entrySet()) {
-                keyValue.put(entry.getKey(), entry.getValue().get(0));
+                formBody.add(entry.getKey(), entry.getValue().get(0));
             }
 
-            try {
-                HttpRequest request = HttpRequest.post(MainActivity.DOMAIN+path)
-                        .acceptJson()
-                        .form(keyValue);
-
-                int code = request.code();
-                String body = request.body(), message = request.message();
-                request.disconnect();
-
+            try (okhttp3.Response response = okHttpClient.newCall(new Request.Builder()
+            .url(Constants.DOMAIN+path).post(formBody.build()).build()).execute()) {
+                int code = response.code();
                 if (code==200) {
-                    return newFixedLengthResponse(Response.Status.OK, "application/json", body);
+                    return newFixedLengthResponse(Response.Status.OK, "application/json", response.body().string());
                 }
                 else {
-                    return newFixedLengthResponse(Response.Status.NOT_FOUND, "text/plain", message);
+                    return newFixedLengthResponse(Response.Status.lookup(code), "text/plain", response.message());
                 }
             }
             catch (Exception ignore) {}

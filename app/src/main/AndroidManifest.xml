@@ -17,15 +17,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.h5mota.MainActivity">
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name="com.h5mota.WebActivity"
+        <activity android:name=".WebActivity"
                   android:hardwareAccelerated="true"/>
+        <activity android:name=".lib.subactivity.SubActivity"
+            android:screenOrientation="portrait" />
         <receiver android:name="com.h5mota.DownloadReceiver" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.DOWNLOAD_COMPLETE"/>

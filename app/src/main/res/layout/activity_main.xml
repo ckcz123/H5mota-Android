@@ -58,6 +58,46 @@
         </android.support.v7.widget.CardView>
 
         <android.support.v7.widget.CardView
+            android:id="@+id/bbs"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="3dp"
+            android:layout_weight="1"
+            app:cardBackgroundColor="@android:color/holo_green_light"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="12dp"
+            app:contentPadding="0dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/textView10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@+id/textView11"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="27dp"
+                    android:text="论坛交流"
+                    android:textColor="#000000"
+                    android:textSize="24sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/textView11"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:lineSpacingMultiplier="1.2"
+                    android:text="点击进入网站论坛交流页面"
+                    android:textSize="15sp"/>
+
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
             android:id="@+id/offline"
             android:layout_width="match_parent"
             android:layout_height="0dp"

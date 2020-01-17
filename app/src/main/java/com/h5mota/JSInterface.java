@@ -13,7 +13,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.webkit.JavascriptInterface;
 
-import com.h5mota.lib.CustomToast;
+import com.h5mota.lib.view.CustomToast;
 
 import java.io.FileWriter;
 import java.io.IOException;

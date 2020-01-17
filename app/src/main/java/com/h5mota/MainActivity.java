@@ -6,23 +6,26 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.h5mota.BuildConfig;
-import com.h5mota.R;
-import com.h5mota.lib.CustomToast;
-import com.h5mota.lib.HttpRequest;
+import com.h5mota.lib.BaseActivity;
+import com.h5mota.lib.Constants;
+import com.h5mota.lib.Cookies;
+import com.h5mota.lib.subactivity.SubActivity;
+import com.h5mota.lib.view.CustomToast;
 import com.h5mota.lib.MyWebServer;
 import com.h5mota.lib.Utils;
 
-import org.json.JSONObject;
+import com.h5mota.lib.json.JSONObject;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 import java.io.File;
 import java.net.URLEncoder;
@@ -34,10 +37,7 @@ import me.weyye.hipermission.HiPermission;
 import me.weyye.hipermission.PermissionCallback;
 import me.weyye.hipermission.PermissionItem;
 
-public class MainActivity extends AppCompatActivity {
-
-    public static final String DOMAIN = "https://h5mota.com";
-    public static final String LOCAL = "http://127.0.0.1:1055/";
+public class MainActivity extends BaseActivity {
     public File directory;
 
     SimpleWebServer simpleWebServer;
@@ -79,7 +79,16 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.online).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                loadUrl(DOMAIN, "HTML5魔塔列表");
+                loadUrl(Constants.DOMAIN, "HTML5魔塔列表");
+            }
+        });
+
+        findViewById(R.id.bbs).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(MainActivity.this, SubActivity.class);
+                intent.putExtra("type", Constants.SUBACTIVITY_TYPE_ABOUT);
+                startActivity(intent);
             }
         });
 
@@ -98,19 +107,21 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    HttpRequest httpRequest=HttpRequest.get(DOMAIN+"/games/_client/")
-                            .followRedirects(true).useCaches(false);
-                    String s=httpRequest.body();
-                    httpRequest.disconnect();
-                    JSONObject jsonObject=new JSONObject(s);
-                    final JSONObject android = jsonObject.getJSONObject("android");
-                    String version = android.getString("version");
-                    if (!version.equals(BuildConfig.VERSION_NAME)) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    new AlertDialog.Builder(MainActivity.this).setTitle("存在版本更新！")
+                    OkHttpClient okHttpClient = new OkHttpClient()
+                        .newBuilder().followRedirects(true).followSslRedirects(true)
+                        .cookieJar(Cookies.getInstance()).build();
+                    try (Response response = okHttpClient.newCall(new Request.Builder()
+                        .url(Constants.DOMAIN+"/games/_client/").build()).execute()) {
+                        String s = response.body().string();
+                        JSONObject jsonObject=new JSONObject(s);
+                        final JSONObject android = jsonObject.getJSONObject("android");
+                        String version = android.getString("version");
+                        if (!version.equals(BuildConfig.VERSION_NAME)) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        new AlertDialog.Builder(MainActivity.this).setTitle("存在版本更新！")
                                             .setMessage(android.getString("text")).setCancelable(true)
                                             .setPositiveButton("下载", new DialogInterface.OnClickListener() {
                                                 @Override
@@ -123,12 +134,11 @@ public class MainActivity extends AppCompatActivity {
                                                     }
                                                 }
                                             }).setNegativeButton("取消", null).create().show();
+                                    }
+                                    catch (Exception e) {e.printStackTrace();}
                                 }
-                                catch (Exception e) {e.printStackTrace();}
-                            }
-                        });
-
-
+                            });
+                        }
                     }
                 }
                 catch (Exception e) {
@@ -138,6 +148,9 @@ public class MainActivity extends AppCompatActivity {
         }).start();
 
     }
+
+    @Override
+    protected void finishRequest(int type, String string) {}
 
     private void initSDCard() {
 
@@ -189,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         try {
                             String name=names.get(i);
-                            loadUrl(LOCAL+ URLEncoder.encode(name, "utf-8"), name);
+                            loadUrl(Constants.LOCAL+ URLEncoder.encode(name, "utf-8"), name);
                         }
                         catch (Exception e) {
                             e.printStackTrace();
@@ -211,23 +224,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     double exittime=0;
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode==KeyEvent.KEYCODE_BACK && event.getAction()==KeyEvent.ACTION_DOWN) {
-            if (System.currentTimeMillis()-exittime>2000) {
-                Toast.makeText(this, "再按一遍退出程序", Toast.LENGTH_SHORT).show();
-                exittime=System.currentTimeMillis();
-            }
-            else
-            {
-                exittime=0;
-                finish();
-            }
-            return true;
+    public void wantToExit() {
+        if (System.currentTimeMillis()-exittime>2000) {
+            Toast.makeText(this, "再按一遍退出程序", Toast.LENGTH_SHORT).show();
+            exittime=System.currentTimeMillis();
         }
-        return false;
+        else
+        {
+            exittime=0;
+            setResult(RESULT_CANCELED);
+            finish();
+        }
     }
-
-
 
     public boolean onCreateOptionsMenu(Menu menu) {
         return super.onCreateOptionsMenu(menu);
@@ -250,14 +258,14 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         if (i==0) {
-                            loadUrl(DOMAIN+"/clearStorage.php", "清理在线垃圾存档");
+                            loadUrl(Constants.DOMAIN+"/clearStorage.php", "清理在线垃圾存档");
                         }
                         else if (i==1) {
                             File clearFile = new File(directory, "clearStorage.html");
                             if (!clearFile.exists()) {
                                 Utils.copyFilesFassets(MainActivity.this, "clearStorage.html", directory+"/clearStorage.html");
                             }
-                            loadUrl(LOCAL+"clearStorage.html", "清理离线垃圾存档");
+                            loadUrl(Constants.LOCAL+"clearStorage.html", "清理离线垃圾存档");
                         }
                     }
                 }).setTitle("垃圾存档清理工具").setCancelable(true).create().show();

@@ -6,9 +6,10 @@ android {
         applicationId "com.h5mota"
         minSdkVersion 19
         targetSdkVersion 26
-        versionCode 25
-        versionName "1.9.1"
+        versionCode 27
+        versionName "2.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        buildConfigField 'String', 'BUILD_TIME', 'new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(new java.util.Date(' + System.currentTimeMillis() +'L))'
     }
     signingConfigs {
         debug {
@@ -20,6 +21,10 @@ android {
             keyAlias "h5mota"
             keyPassword "h5mota"
         }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
     buildTypes {
         release {
@@ -41,7 +46,8 @@ dependencies {
     implementation 'com.android.support:cardview-v7:26.1.0'
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
     implementation 'org.nanohttpd:nanohttpd-webserver:2.3.1'
-    compile 'me.weyye.hipermission:library:1.0.7'
+    implementation 'me.weyye.hipermission:library:1.0.7'
+    implementation 'com.squareup.okhttp3:okhttp:4.3.1'
     //Bugly support
-    compile 'com.tencent.bugly:crashreport:latest.release'
+    implementation 'com.tencent.bugly:crashreport:latest.release'
 }

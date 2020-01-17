@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/BaseActivity.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/Constants.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/Editor.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/ImageRequest.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/MyBitmapFactory.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/Util.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/json/CDL.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/json/Cookie.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/json/CookieList.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/json/HTTP.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/json/HTTPTokener.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/json/JSONArray.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/json/JSONException.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/json/JSONML.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/json/JSONObject.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/json/JSONPointer.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/json/JSONPointerException.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/json/JSONString.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/json/JSONStringer.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/json/JSONTokener.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/json/JSONWriter.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/json/Property.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/json/XML.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/json/XMLTokener.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/view/AspectRatioImageView.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/view/BadgeView.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/view/CustomToast.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/view/CustomViewPager.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/view/GifImageView.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/view/MyDatePickerDialog.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/view/MyNotification.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/view/MyTimePickerDialog.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/view/SquareRelativeLayout.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/view/TouchImageView.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/webconnection/Cookies.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/corners_bg.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/dash_line.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/failure.png" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/hot.png" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/ic_add_white_36dp.png" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/ic_arrow_back_white_36dp.png" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/ic_arrow_forward_white_36dp.png" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/ic_chevron_left_white_36dp.png" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/ic_chevron_right_white_36dp.png" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/ic_close_white_36dp.png" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/ic_open_in_new_white_36dp.png" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/ic_refresh_white_36dp.png" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/ic_reply_white_36dp.png" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/ic_save_white_36dp.png" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/ic_share_white_36dp.png" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/info.png" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/list.png" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/search.png" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/settings.png" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/about.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/subactivity_gifview.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/subactivity_imageview.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/subactivity_webview.xml" charset="GBK" />
+  </component>
+</project>
