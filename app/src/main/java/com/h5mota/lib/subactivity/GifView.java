@@ -2,7 +2,6 @@ package com.h5mota.lib.subactivity;
 
 import android.os.Environment;
 import android.widget.ImageView.ScaleType;
-
 import com.h5mota.R;
 import com.h5mota.lib.MyFile;
 import com.h5mota.lib.view.CustomToast;
@@ -55,22 +54,27 @@ public class GifView {
       CustomToast.showErrorToast(subActivity, "该图片无法保存到本地");
       return;
     }
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss", Locale.getDefault());
+    SimpleDateFormat simpleDateFormat =
+        new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss", Locale.getDefault());
     String time = simpleDateFormat.format(new Date());
-    new File(Environment.getExternalStorageDirectory() + "/Pictures/capubbs/").mkdirs();
-    String filepath = Environment.getExternalStorageDirectory() + "/Pictures/capubbs/"
-        + title + "__" + time + ".gif";
+    new File(Environment.getExternalStorageDirectory() + "/H5mota/_Pictures/").mkdirs();
+    String filepath =
+        Environment.getExternalStorageDirectory()
+            + "/H5mota/_Pictures/"
+            + title
+            + "__"
+            + time
+            + ".gif";
     if (MyFile.copyFile(this.filepath, filepath)) {
       if (android.os.Build.VERSION.SDK_INT < 16)
         CustomToast.showSuccessToast(subActivity, "图片保存在\n" + filepath, 3500);
       else {
-        MyNotification.sendNotificationToOpenfile("图片已保存",
-            "图片保存在" + filepath, "图片保存在" + filepath, subActivity,
-            new File(filepath));
+        MyNotification.sendNotificationToOpenfile(
+            "图片已保存", "图片保存在" + filepath, "图片保存在" + filepath, subActivity, new File(filepath));
       }
-    } else
-      CustomToast.showErrorToast(subActivity, "保存失败");
+    } else CustomToast.showErrorToast(subActivity, "保存失败");
   }
+
   public void stop() {
     try {
       gifImageView.stopAnimation();
@@ -78,4 +82,3 @@ public class GifView {
     }
   }
 }
-

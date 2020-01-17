@@ -12,5 +12,4 @@ public class Parameters {
   public static Parameters create(String name, String value) {
     return new Parameters(name, value);
   }
-
 }

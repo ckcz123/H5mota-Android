@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
-
 import com.h5mota.lib.subactivity.SubActivity;
 import com.h5mota.lib.view.CustomToast;
 import java.io.File;
@@ -22,15 +21,13 @@ public class ImageRequest extends AsyncTask<String, String, File> {
 
   public static void showImage(Context context, String url, String title) {
     File file = MyFile.getCache(context, Utils.getHash(url));
-    if (!file.exists())
-      new ImageRequest(context, url, title).execute("");
+    if (!file.exists()) new ImageRequest(context, url, title).execute("");
     else {
       Intent intent = new Intent(context, SubActivity.class);
       if (title.toLowerCase(Locale.getDefault()).endsWith(".gif")
           || url.toLowerCase(Locale.getDefault()).endsWith(".gif"))
         intent.putExtra("type", Constants.SUBACTIVITY_TYPE_PICTURE_GIF);
-      else
-        intent.putExtra("type", Constants.SUBACTIVITY_TYPE_PICTURE_FILE);
+      else intent.putExtra("type", Constants.SUBACTIVITY_TYPE_PICTURE_FILE);
       intent.putExtra("title", title.toLowerCase(Locale.getDefault()));
       intent.putExtra("file", file.getAbsolutePath());
       context.startActivity(intent);
@@ -59,8 +56,7 @@ public class ImageRequest extends AsyncTask<String, String, File> {
     try {
       File file = MyFile.getCache(context, Utils.getHash(url));
       if (file.exists()) return file;
-      if (MyFile.urlToFile(url, file))
-        return file;
+      if (MyFile.urlToFile(url, file)) return file;
       return null;
     } catch (Exception e) {
       return null;
@@ -76,6 +72,4 @@ public class ImageRequest extends AsyncTask<String, String, File> {
     }
     showImage(context, url, title);
   }
-
 }
-

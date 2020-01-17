@@ -1,11 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/AllBoardsFragment.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/AllBoardsFragment.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/AllBoardsFragment.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/BBSActivity.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/BBSActivity.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/Board.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/FavoriteActivity.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/LZLActivity.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/PostActivity.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/PostInfo.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/PostInfo.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/SearchFragment.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/SearchInfo.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/SearchInfo.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/SettingsFragment.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/ThreadInfo.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/TopFragment.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/Userinfo.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/ViewActivity.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/ViewPost.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/ViewThread.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/BaseActivity.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/Constants.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/Editor.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/ImageRequest.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/MyBitmapFactory.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/MyCalendar.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/Util.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/json/CDL.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/json/Cookie.java" charset="GBK" />
@@ -56,8 +78,27 @@
     <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/search.png" charset="GBK" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/drawable/settings.png" charset="GBK" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/about.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/bbs_login_view.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/bbs_main.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/bbs_message_detail.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/bbs_message_item.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/bbs_message_listview.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/bbs_post_item.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/bbs_post_listview.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/bbs_post_mail.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/bbs_postpage.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/bbs_search_item.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/bbs_search_view.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/bbs_thread_item.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/bbs_thread_listview.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/bbs_top_listitem.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/bbs_top_listview.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/edittext.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/lzl_view.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/layout/setting_view.xml" charset="GBK" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/subactivity_gifview.xml" charset="GBK" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/subactivity_imageview.xml" charset="GBK" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/layout/subactivity_webview.xml" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/values/dimens.xml" charset="GBK" />
   </component>
 </project>

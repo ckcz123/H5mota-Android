@@ -8,10 +8,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Environment;
-import android.os.Message;
 import android.util.Log;
 import android.widget.ImageView.ScaleType;
-
 import com.h5mota.R;
 import com.h5mota.lib.Constants;
 import com.h5mota.lib.MyBitmapFactory;
@@ -76,8 +74,11 @@ public class Picture {
   void init(String _title) {
     title = _title;
     title = title.trim();
-    if (title.endsWith(".jpg") || title.endsWith(".jpeg") || title.endsWith(".bmp")
-        || title.endsWith(".png") || title.endsWith(".gif")) {
+    if (title.endsWith(".jpg")
+        || title.endsWith(".jpeg")
+        || title.endsWith(".bmp")
+        || title.endsWith(".png")
+        || title.endsWith(".gif")) {
       title = title.substring(0, title.lastIndexOf("."));
     }
     if ("".equals(title)) title = "查看图片";
@@ -94,34 +95,33 @@ public class Picture {
       CustomToast.showErrorToast(subActivity, "该图片无法保存到本地");
       return;
     }
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss", Locale.getDefault());
+    SimpleDateFormat simpleDateFormat =
+        new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss", Locale.getDefault());
     String time = simpleDateFormat.format(new Date());
-    new File(Environment.getExternalStorageDirectory() + "/Pictures/capubbs/").mkdirs();
+    new File(Environment.getExternalStorageDirectory() + "/H5mota/_Pictures/").mkdirs();
     String t = new String(title);
     if (t.length() >= 15) t = t.substring(0, 13) + "...";
-    String filepath = Environment.getExternalStorageDirectory() + "/Pictures/capubbs/"
-        + t + "__" + time + ".png";
+    String filepath =
+        Environment.getExternalStorageDirectory() + "/H5mota/_Pictures/" + t + "__" + time + ".png";
     if (MyFile.copyFile(this.filepath, filepath)) {
       if (android.os.Build.VERSION.SDK_INT < 16)
         CustomToast.showSuccessToast(subActivity, "图片保存在\n" + filepath, 3500);
       else {
-        MyNotification.sendNotificationToOpenfile("图片已保存",
-            "图片保存在" + filepath, "图片保存在" + filepath, subActivity,
-            new File(filepath));
+        MyNotification.sendNotificationToOpenfile(
+            "图片已保存", "图片保存在" + filepath, "图片保存在" + filepath, subActivity, new File(filepath));
       }
-    } else
-      CustomToast.showErrorToast(subActivity, "保存失败");
-		/*
-		try {
-			Bitmap bitmap=((BitmapDrawable)drawable).getBitmap();
-			FileOutputStream fileOutputStream=new FileOutputStream(filepath);
-			bitmap.compress(CompressFormat.PNG, 100, fileOutputStream);
-			fileOutputStream.flush();
-			fileOutputStream.close();
-			CustomToast.showSuccessToast(subActivity, "图片保存在 "+filepath);
-		}
-		catch (Exception e) {e.printStackTrace();}
-		*/
+    } else CustomToast.showErrorToast(subActivity, "保存失败");
+    /*
+    try {
+    	Bitmap bitmap=((BitmapDrawable)drawable).getBitmap();
+    	FileOutputStream fileOutputStream=new FileOutputStream(filepath);
+    	bitmap.compress(CompressFormat.PNG, 100, fileOutputStream);
+    	fileOutputStream.flush();
+    	fileOutputStream.close();
+    	CustomToast.showSuccessToast(subActivity, "图片保存在 "+filepath);
+    }
+    catch (Exception e) {e.printStackTrace();}
+    */
   }
 
   public void sharePicture() {
@@ -130,18 +130,18 @@ public class Picture {
       return;
     }
     // Share.readyToShareImage(subActivity, "分享图片", bitmap);
-    CustomToast.showInfoToast(subActivity,"分享功能暂时还未上线！");
+    CustomToast.showInfoToast(subActivity, "分享功能暂时还未上线！");
   }
 
   public void decodePicture(final String string) {
     Log.w("qrcode", string);
-    if (string.startsWith("http://")
-        || string.startsWith("https://")) {
+    if (string.startsWith("http://") || string.startsWith("https://")) {
       if (string.startsWith("http://weixin.qq.com/")) {
-        new AlertDialog.Builder(subActivity).setTitle("提示")
-            .setMessage("微信用户和微信群的二维码无法正确识别，"
-                + "请分享到微信后再用微信进行识别。")
-            .setPositiveButton("确定", null).show();
+        new AlertDialog.Builder(subActivity)
+            .setTitle("提示")
+            .setMessage("微信用户和微信群的二维码无法正确识别，" + "请分享到微信后再用微信进行识别。")
+            .setPositiveButton("确定", null)
+            .show();
         return;
       }
       Intent intent = new Intent(subActivity, SubActivity.class);
@@ -150,16 +150,21 @@ public class Picture {
       intent.putExtra("title", title);
       subActivity.startActivity(intent);
     } else {
-      new AlertDialog.Builder(subActivity).setTitle("识别二维码")
-          .setMessage(string).setPositiveButton("确定", null).
-          setNegativeButton("复制", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-              ClipboardManager clipboardManager = (ClipboardManager) subActivity.getSystemService(Context.CLIPBOARD_SERVICE);
-              clipboardManager.setPrimaryClip(ClipData.newPlainText("text", string));
-              CustomToast.showSuccessToast(subActivity, "已复制到剪切板！", 1500);
-            }
-          }).show();
+      new AlertDialog.Builder(subActivity)
+          .setTitle("识别二维码")
+          .setMessage(string)
+          .setPositiveButton("确定", null)
+          .setNegativeButton(
+              "复制",
+              new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                  ClipboardManager clipboardManager =
+                      (ClipboardManager) subActivity.getSystemService(Context.CLIPBOARD_SERVICE);
+                  clipboardManager.setPrimaryClip(ClipData.newPlainText("text", string));
+                  CustomToast.showSuccessToast(subActivity, "已复制到剪切板！", 1500);
+                }
+              })
+          .show();
     }
   }
 }
-

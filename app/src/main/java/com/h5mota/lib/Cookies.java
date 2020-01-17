@@ -25,9 +25,7 @@ public class Cookies implements CookieJar {
     HashMap<String, String> hashMap = cookies.get(httpUrl.host());
     if (hashMap == null) return list;
     for (Map.Entry<String, String> entry : hashMap.entrySet()) {
-      list.add(new Cookie.Builder()
-      .name(entry.getKey()).value(entry.getValue())
-      .build());
+      list.add(new Cookie.Builder().name(entry.getKey()).value(entry.getValue()).build());
     }
     return list;
   }

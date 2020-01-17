@@ -19,8 +19,7 @@ public class MyFile {
   }
 
   public static File getFile(Context context, String _dir, String _name) {
-    String dir = (_dir == null ? "" : _dir).trim(),
-        name = (_name == null ? "" : _name).trim();
+    String dir = (_dir == null ? "" : _dir).trim(), name = (_name == null ? "" : _name).trim();
 
     File file = "".equals(dir) ? getFilesDir(context) : new File(getFilesDir(context), dir);
     if (file.exists() && file.isFile()) file.delete();
@@ -28,9 +27,8 @@ public class MyFile {
     return "".equals(name) ? file : new File(file, name);
   }
 
-  public static String getString(Context context,
-      String username, String name,
-      String defaultString) throws Exception {
+  public static String getString(
+      Context context, String username, String name, String defaultString) throws Exception {
     File file = getFile(context, username, name);
     if (!file.exists()) {
       file.createNewFile();
@@ -49,8 +47,7 @@ public class MyFile {
     return new String(Base64.decode(bytes, Base64.DEFAULT));
   }
 
-  public static void putString(
-      Context context, String username, String name, String stringToWrite)
+  public static void putString(Context context, String username, String name, String stringToWrite)
       throws Exception {
     File file = getFile(context, username, name);
     if (!file.exists()) {
@@ -90,8 +87,7 @@ public class MyFile {
       FileOutputStream fileOutputStream = new FileOutputStream(tmpFile);
       byte[] bts = new byte[2048];
       int len;
-      while ((len = inputStream.read(bts)) != -1)
-        fileOutputStream.write(bts, 0, len);
+      while ((len = inputStream.read(bts)) != -1) fileOutputStream.write(bts, 0, len);
       fileOutputStream.close();
       file.delete();
       return tmpFile.renameTo(file);
@@ -112,9 +108,10 @@ public class MyFile {
 
   public static boolean urlToFile(String url, File file, boolean override) {
     if (!override && file != null && file.exists()) return true;
-    OkHttpClient okHttpClient = new OkHttpClient().newBuilder().cookieJar(Cookies.getInstance())
-        .build();
-    try (Response response = okHttpClient.newCall(new Request.Builder().url(url).build()).execute()) {
+    OkHttpClient okHttpClient =
+        new OkHttpClient().newBuilder().cookieJar(Cookies.getInstance()).build();
+    try (Response response =
+        okHttpClient.newCall(new Request.Builder().url(url).build()).execute()) {
       return streamToFile(response.body().byteStream(), file);
     } catch (Exception e) {
       return false;
@@ -126,8 +123,7 @@ public class MyFile {
     if (file.isDirectory()) {
       File[] files = file.listFiles();
       int cnt = 0;
-      for (File f : files)
-        cnt += getFileCount(f);
+      for (File f : files) cnt += getFileCount(f);
       return cnt;
     }
     return 1;
@@ -138,8 +134,7 @@ public class MyFile {
     if (file.isDirectory()) {
       File[] files = file.listFiles();
       long size = 0;
-      for (File f : files)
-        size += getFileSize(f);
+      for (File f : files) size += getFileSize(f);
       return size;
     }
     return file.length();
@@ -162,8 +157,7 @@ public class MyFile {
     File file = getCache(context, null);
     if (!file.exists() || !file.isDirectory()) return;
     File[] files = file.listFiles();
-    for (File f : files)
-      deleteFile(f);
+    for (File f : files) deleteFile(f);
   }
 
   public static boolean copyFile(String source, String destination) {
@@ -188,6 +182,4 @@ public class MyFile {
       return false;
     }
   }
-
-
 }

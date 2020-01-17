@@ -28,6 +28,16 @@
                   android:hardwareAccelerated="true"/>
         <activity android:name=".lib.subactivity.SubActivity"
             android:screenOrientation="portrait" />
+        <activity android:name=".bbs.BBSActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name=".bbs.ViewActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name=".bbs.PostActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name=".bbs.FavoriteActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name=".bbs.LZLActivity"
+            android:screenOrientation="portrait" />
         <receiver android:name="com.h5mota.DownloadReceiver" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.DOWNLOAD_COMPLETE"/>

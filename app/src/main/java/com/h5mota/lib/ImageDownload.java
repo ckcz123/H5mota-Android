@@ -1,6 +1,5 @@
 package com.h5mota.lib;
 
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.drawable.Drawable;
@@ -8,7 +7,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.widget.ImageView;
-
 import com.h5mota.R;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -25,52 +23,53 @@ public class ImageDownload {
   ArrayList<String> urls = new ArrayList<String>();
   Activity activity;
   EventHandler eventHandler;
+
   @SuppressLint("UseSparseArrays")
   HashMap<Integer, Drawable> hashMap = new HashMap<Integer, Drawable>();
 
-  public ImageDownload(Activity _activity, ImageView imageView,
-      String url) {
+  public ImageDownload(Activity _activity, ImageView imageView, String url) {
     activity = _activity;
     eventHandler = new EventHandler(activity.getMainLooper());
     imageViews.add(imageView);
     urls.add(url);
   }
 
-  public ImageDownload(Activity _activity, ArrayList<ImageView> _imageViews,
-      ArrayList<String> _urls) {
+  public ImageDownload(
+      Activity _activity, ArrayList<ImageView> _imageViews, ArrayList<String> _urls) {
     activity = _activity;
     imageViews = new ArrayList<ImageView>(_imageViews);
     urls = new ArrayList<String>(_urls);
     eventHandler = new EventHandler(activity.getMainLooper());
   }
 
-  /**
-   * 仅当你在构造函数中传入Activity与ImageView时才可被调用
-   * 否则此函数将什么都不做
-   */
+  /** 仅当你在构造函数中传入Activity与ImageView时才可被调用 否则此函数将什么都不做 */
   public void requestAndSetImages() {
     if (activity == null || imageViews == null) return;
     int len = imageViews.size();
     for (int i = 0; i < len; i++) {
       final int j = i;
-      new Thread(new Runnable() {
+      new Thread(
+              new Runnable() {
 
-        @Override
-        public void run() {
-          OkHttpClient okHttpClient = new OkHttpClient().newBuilder().cookieJar(Cookies.getInstance())
-              .build();
-          try (Response response = okHttpClient.newCall(new Request.Builder().url(urls.get(j)).build()).execute()) {
-            InputStream inputStream = response.body().byteStream();
-            Drawable drawable = Drawable.createFromStream(inputStream, j + ".png");
-            eventHandler.sendMessage(Message.obtain(
-                eventHandler, IMAGE_REQUEST_FINISHED, j, 0, drawable));
-          }
-          catch (Exception e) {
-            eventHandler.sendMessage(Message.obtain(
-                eventHandler, IMAGE_REQUEST_FAILED, j, 0));
-          }
-        }
-      }).start();
+                @Override
+                public void run() {
+                  OkHttpClient okHttpClient =
+                      new OkHttpClient().newBuilder().cookieJar(Cookies.getInstance()).build();
+                  try (Response response =
+                      okHttpClient
+                          .newCall(new Request.Builder().url(urls.get(j)).build())
+                          .execute()) {
+                    InputStream inputStream = response.body().byteStream();
+                    Drawable drawable = Drawable.createFromStream(inputStream, j + ".png");
+                    eventHandler.sendMessage(
+                        Message.obtain(eventHandler, IMAGE_REQUEST_FINISHED, j, 0, drawable));
+                  } catch (Exception e) {
+                    eventHandler.sendMessage(
+                        Message.obtain(eventHandler, IMAGE_REQUEST_FAILED, j, 0));
+                  }
+                }
+              })
+          .start();
     }
   }
 
@@ -103,5 +102,4 @@ public class ImageDownload {
       }
     }
   }
-
 }
