@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
                                              xmlns:app="http://schemas.android.com/apk/res-auto"
                                              xmlns:tools="http://schemas.android.com/tools"
                                              android:layout_width="match_parent"
@@ -17,7 +17,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <android.support.v7.widget.CardView
+        <androidx.cardview.widget.CardView
             android:id="@+id/online"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -55,9 +55,9 @@
                     android:textSize="15sp"/>
 
             </RelativeLayout>
-        </android.support.v7.widget.CardView>
+        </androidx.cardview.widget.CardView>
 
-        <android.support.v7.widget.CardView
+        <androidx.cardview.widget.CardView
             android:id="@+id/bbs"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -95,9 +95,9 @@
                     android:textSize="15sp"/>
 
             </RelativeLayout>
-        </android.support.v7.widget.CardView>
+        </androidx.cardview.widget.CardView>
 
-        <android.support.v7.widget.CardView
+        <androidx.cardview.widget.CardView
             android:id="@+id/offline"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -120,7 +120,7 @@
                     android:lineSpacingMultiplier="1.2"
                     android:paddingLeft="30px"
                     android:paddingRight="30px"
-                    android:text="将离线包解压到SD卡的H5mota目录下，即可在离线状态下进行游戏\n（下载方式：游戏菜单-系统设置-下载离线版本）"
+                    android:text="将离线包解压到SD卡的 Android/data/com.h5mota/files/towers 目录下，即可在离线状态下进行游戏\n（下载方式：游戏菜单-系统设置-下载离线版本）"
                     android:textSize="15sp"/>
 
                 <TextView
@@ -135,6 +135,6 @@
                     android:textSize="24sp"
                     android:textStyle="bold"/>
             </RelativeLayout>
-        </android.support.v7.widget.CardView>
+        </androidx.cardview.widget.CardView>
     </LinearLayout>
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

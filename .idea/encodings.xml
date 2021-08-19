@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/CustomToast.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/CustomToast.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/CustomToast.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/AllBoardsFragment.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/AllBoardsFragment.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/AllBoardsFragment.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/BBSActivity.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/BBSActivity.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/Board.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/FavoriteActivity.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/LZLActivity.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/PostActivity.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/PostInfo.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/PostInfo.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/SearchFragment.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/SearchInfo.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/SearchInfo.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/SettingsFragment.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/bbs/ThreadInfo.java" charset="GBK" />
@@ -49,7 +47,6 @@
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/json/XMLTokener.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/view/AspectRatioImageView.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/view/BadgeView.java" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/view/CustomToast.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/view/CustomViewPager.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/view/GifImageView.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/h5mota/lib/view/MyDatePickerDialog.java" charset="GBK" />

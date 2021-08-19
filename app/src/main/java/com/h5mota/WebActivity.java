@@ -3,15 +3,12 @@ package com.h5mota;
 import android.app.DownloadManager;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -19,7 +16,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.webkit.ConsoleMessage;
-import android.webkit.DownloadListener;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
 import android.webkit.SslErrorHandler;
@@ -31,9 +27,10 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import com.h5mota.lib.Constants;
-import com.h5mota.lib.Utils;
-import com.h5mota.lib.view.CustomToast;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
@@ -44,27 +41,28 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-/** Created by castor_v_pollux on 2018/12/30. */
+/**
+ * Created by castor_v_pollux on 2018/12/30.
+ */
 public class WebActivity extends AppCompatActivity {
 
-  WebView webView;
-  ProgressBar progressBar;
-
-  private ValueCallback<Uri> mUploadMessage;
-  public ValueCallback<Uri[]> uploadMessage;
   public static final int REQUEST_SELECT_FILE = 100;
   public static final int JSINTERFACE_SELECT_FILE = 200;
   private static final int FILECHOOSER_RESULTCODE = 2;
-
+  public ValueCallback<Uri[]> uploadMessage;
+  WebView webView;
+  ProgressBar progressBar;
+  private ValueCallback<Uri> mUploadMessage;
   private File LOG_FILE;
   private SimpleDateFormat simpleDateFormat;
+  private JSInterface jsInterface;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_web);
 
-    File log_dir = new File(Environment.getExternalStorageDirectory() + "/H5mota/", ".logs");
+    File log_dir = getExternalFilesDir("_logs");
     if (!log_dir.exists() && !log_dir.mkdirs()) {
       LOG_FILE = null;
     } else {
@@ -104,8 +102,11 @@ public class WebActivity extends AppCompatActivity {
     webSettings.setRenderPriority(WebSettings.RenderPriority.HIGH);
     webSettings.setLoadsImagesAutomatically(true);
     webSettings.setAppCacheEnabled(true);
+    webSettings.setNeedInitialFocus(false);
+    webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
 
-    webView.addJavascriptInterface(new JSInterface(this), "jsinterface");
+    jsInterface = new JSInterface(this, webView);
+    webView.addJavascriptInterface(jsInterface, "jsinterface");
 
     webView.setWebViewClient(
         new WebViewClient() {
@@ -123,6 +124,7 @@ public class WebActivity extends AppCompatActivity {
             super.onPageFinished(view, url);
             progressBar.setVisibility(View.GONE);
             setTitle(webView.getTitle());
+            jsInterface.onWebViewPageLoaded();
           }
 
           public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
@@ -139,12 +141,7 @@ public class WebActivity extends AppCompatActivity {
                 .setMessage(message)
                 .setPositiveButton(
                     "OK",
-                    new DialogInterface.OnClickListener() {
-                      @Override
-                      public void onClick(DialogInterface dialog, int which) {
-                        result.confirm();
-                      }
-                    })
+                    (dialog, which) -> result.confirm())
                 .setCancelable(false)
                 .show();
             return true;
@@ -157,20 +154,10 @@ public class WebActivity extends AppCompatActivity {
                 .setMessage(message)
                 .setPositiveButton(
                     "OK",
-                    new DialogInterface.OnClickListener() {
-                      @Override
-                      public void onClick(DialogInterface dialog, int which) {
-                        result.confirm();
-                      }
-                    })
+                    (dialog, which) -> result.confirm())
                 .setNegativeButton(
                     "Cancel",
-                    new DialogInterface.OnClickListener() {
-                      @Override
-                      public void onClick(DialogInterface dialog, int which) {
-                        result.cancel();
-                      }
-                    })
+                    (dialog, which) -> result.cancel())
                 .setCancelable(false)
                 .show();
             return true;
@@ -189,41 +176,14 @@ public class WebActivity extends AppCompatActivity {
                 .setView(et)
                 .setPositiveButton(
                     "OK",
-                    new DialogInterface.OnClickListener() {
-                      @Override
-                      public void onClick(DialogInterface dialog, int which) {
-                        result.confirm(et.getText().toString());
-                      }
-                    })
+                    (dialog, which) -> result.confirm(et.getText().toString()))
                 .setNegativeButton(
                     "Cancel",
-                    new DialogInterface.OnClickListener() {
-                      @Override
-                      public void onClick(DialogInterface dialog, int which) {
-                        result.cancel();
-                      }
-                    })
+                    (dialog, which) -> result.cancel())
                 .setCancelable(false)
                 .show();
 
             return true;
-          }
-
-          public void openFileChooser(ValueCallback<Uri> uploadMsg) {
-            mUploadMessage = uploadMsg;
-            Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-            i.addCategory(Intent.CATEGORY_OPENABLE);
-            i.setType("*/*");
-            startActivityForResult(i, FILECHOOSER_RESULTCODE);
-          }
-
-          public void openFileChooser(
-              ValueCallback<Uri> uploadMsg, String acceptType, String capture) {
-            openFileChooser(uploadMsg);
-          }
-
-          protected void openFileChooser(ValueCallback uploadMsg, String acceptType) {
-            openFileChooser(uploadMsg);
           }
 
           public boolean onShowFileChooser(
@@ -235,13 +195,10 @@ public class WebActivity extends AppCompatActivity {
               uploadMessage = null;
             }
             uploadMessage = filePathCallback;
-            Intent intent = fileChooserParams.createIntent();
-            try {
-              startActivityForResult(intent, REQUEST_SELECT_FILE);
-            } catch (ActivityNotFoundException e) {
-              uploadMessage = null;
-              return false;
-            }
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("*/*");
+            startActivityForResult(
+                Intent.createChooser(intent, "请选择文件"), WebActivity.REQUEST_SELECT_FILE);
             return true;
           }
 
@@ -255,7 +212,9 @@ public class WebActivity extends AppCompatActivity {
             if (msg.equals("[object Object]")
                 || msg.equals("localForage supported!")
                 || msg.equals("插件编写测试")
-                || msg.equals("开始游戏")) return false;
+                || msg.equals("开始游戏")
+                || msg.startsWith("插件函数转发")
+                || msg.startsWith("警告！")) return false;
             ConsoleMessage.MessageLevel level = message.messageLevel();
             if (level != ConsoleMessage.MessageLevel.LOG
                 && level != ConsoleMessage.MessageLevel.ERROR) return false;
@@ -276,41 +235,34 @@ public class WebActivity extends AppCompatActivity {
           }
         });
     webView.setDownloadListener(
-        new DownloadListener() {
-          public void onDownloadStart(
-              String url,
-              String userAgent,
-              String contentDisposition,
-              String mimetype,
-              long contentLength) {
-            try {
-              DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
-              Log.i("mimetype", mimetype);
+        (url, userAgent, contentDisposition, mimetype, contentLength) -> {
+          try {
+            DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+            Log.i("mimetype", mimetype);
 
-              request.setMimeType(mimetype);
-              request.allowScanningByMediaScanner();
-              request.setNotificationVisibility(
-                  DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-              String filename = URLUtil.guessFileName(url, contentDisposition, mimetype);
-              new File(Environment.getExternalStorageDirectory() + "/H5mota/").mkdirs();
-              File file =
-                  new File(Environment.getExternalStorageDirectory() + "/H5mota/" + filename);
-              if (file.exists()) file.delete();
-              request.setDestinationUri(Uri.fromFile(file));
-              request.setTitle("正在下载" + filename + "...");
-              request.setDescription("文件保存在" + file.getAbsolutePath());
-              DownloadManager downloadManager =
-                  (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-              downloadManager.enqueue(request);
+            request.setMimeType(mimetype);
+            request.allowScanningByMediaScanner();
+            request.setNotificationVisibility(
+                DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+            String filename = URLUtil.guessFileName(url, contentDisposition, mimetype);
+            File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            File file = new File(dir, filename);
+            if (file.exists()) file.delete();
+            request.setDestinationUri(Uri.fromFile(file));
+            request.setTitle("正在下载" + filename + "...");
+            request.setDescription("文件保存在" + file.getAbsolutePath());
+            DownloadManager downloadManager =
+                (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+            downloadManager.enqueue(request);
 
-              CustomToast.showInfoToast(WebActivity.this, "文件下载中，请在通知栏查看进度");
-            } catch (Exception e) {
-              if (url.startsWith("blob")) {
-                CustomToast.showErrorToast(WebActivity.this, "无法下载文件！");
-                return;
-              }
-              startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+            CustomToast.showInfoToast(WebActivity.this, "文件下载中，请在通知栏查看进度");
+          } catch (Exception e) {
+            Log.e("ERROR", "Error", e);
+            if (url.startsWith("blob")) {
+              CustomToast.showErrorToast(WebActivity.this, "无法下载文件！");
+              return;
             }
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
           }
         });
     webView.loadUrl(getIntent().getStringExtra("url"));
@@ -349,12 +301,12 @@ public class WebActivity extends AppCompatActivity {
           if (result == null) break;
           Log.i("Path", result.getPath());
           try (InputStream inputStream = getContentResolver().openInputStream(result);
-              BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+               BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
             String line;
             StringBuilder builder = new StringBuilder();
             while ((line = reader.readLine()) != null) builder.append(line);
             webView.evaluateJavascript(
-                "core.readFileContent('" + builder.toString().replace('\'', '\"') + "')", null);
+                "core.readFileContent(" + jsInterface.replaceContent(builder.toString()) + ")", null);
           } catch (Exception e) {
             CustomToast.showErrorToast(this, "读取失败！");
             e.printStackTrace();
@@ -393,36 +345,31 @@ public class WebActivity extends AppCompatActivity {
         webView.clearCache(true);
         webView.reload();
         break;
-      case 1:
-        {
-          new AlertDialog.Builder(this)
-              .setItems(
-                  new String[] {"清理在线垃圾存档", "清理离线垃圾存档"},
-                  new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                      if (i == 0) {
-                        webView.loadUrl(Constants.DOMAIN + "/clearStorage.php");
-                      } else if (i == 1) {
-                        File directory =
-                            new File(Environment.getExternalStorageDirectory() + "/H5mota/");
-                        File clearFile = new File(directory, "clearStorage.html");
-                        if (!clearFile.exists()) {
-                          Utils.copyFilesFassets(
-                              WebActivity.this,
-                              "clearStorage.html",
-                              directory + "/clearStorage.html");
-                        }
-                        webView.loadUrl(Constants.LOCAL + "clearStorage.html");
-                      }
+      case 1: {
+        new AlertDialog.Builder(this)
+            .setItems(
+                new String[]{"清理在线垃圾存档", "清理离线垃圾存档"},
+                (dialogInterface, i) -> {
+                  if (i == 0) {
+                    webView.loadUrl(MainActivity.DOMAIN + "/clearStorage.php");
+                  } else if (i == 1) {
+                    File directory = getExternalFilesDir("towers");
+                    File clearFile = new File(directory, "clearStorage.html");
+                    if (!clearFile.exists()) {
+                      Utils.copyFilesFassets(
+                          WebActivity.this,
+                          "clearStorage.html",
+                          directory + "/clearStorage.html");
                     }
-                  })
-              .setTitle("垃圾存档清理工具")
-              .setCancelable(true)
-              .create()
-              .show();
-          break;
-        }
+                    webView.loadUrl(MainActivity.LOCAL + "clearStorage.html");
+                  }
+                })
+            .setTitle("垃圾存档清理工具")
+            .setCancelable(true)
+            .create()
+            .show();
+        break;
+      }
       case 2:
         webView.loadUrl("about:blank");
         finish();

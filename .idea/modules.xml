@@ -2,10 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/H5mota.iml" filepath="$PROJECT_DIR$/H5mota.iml" />
-      <module fileurl="file://E:/android/H5mota/H5mota-Android.iml" filepath="E:/android/H5mota/H5mota-Android.iml" />
-      <module fileurl="file://$PROJECT_DIR$/StudioProjects-H5mota-Android.iml" filepath="$PROJECT_DIR$/StudioProjects-H5mota-Android.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/H5mota-Android.iml" filepath="$PROJECT_DIR$/.idea/modules/H5mota-Android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/H5mota-Android.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/H5mota-Android.app.iml" />
     </modules>
   </component>
 </project>

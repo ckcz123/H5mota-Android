@@ -7,13 +7,15 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
-import android.support.v4.content.FileProvider;
 import android.util.Log;
-import com.h5mota.lib.Utils;
-import com.h5mota.lib.view.CustomToast;
+
+import androidx.core.content.FileProvider;
+
 import java.io.File;
 
-/** Created by oc on 2018/4/25. */
+/**
+ * Created by oc on 2018/4/25.
+ */
 public class DownloadReceiver extends BroadcastReceiver {
 
   @Override
@@ -38,8 +40,8 @@ public class DownloadReceiver extends BroadcastReceiver {
 
           if (name.endsWith(".zip")) {
 
-            if (Utils.unzip(file, file.getParentFile())) {
-              CustomToast.showSuccessToast(context, "已成功下载并解压到SD卡的H5mota目录下。", 2500);
+            if (Utils.unzip(file, context.getExternalFilesDir("towers"))) {
+              CustomToast.showSuccessToast(context, "已成功下载并解压到 SD卡/Android/data/com.h5mota/files/towers 目录下。", 2500);
             } else {
               CustomToast.showInfoToast(context, "已成功下载文件，但是未能成功解压，请手动进行解压操作。", 2500);
             }
@@ -47,12 +49,10 @@ public class DownloadReceiver extends BroadcastReceiver {
           } else if (name.endsWith(".apk")) {
             // auto install
             try {
-
               Intent install = new Intent(Intent.ACTION_VIEW);
               install.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
               if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                install.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                install.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 Uri contentUri =
                     FileProvider.getUriForFile(
                         context, BuildConfig.APPLICATION_ID + ".fileprovider", file);
@@ -64,10 +64,10 @@ public class DownloadReceiver extends BroadcastReceiver {
               context.startActivity(install);
             } catch (Exception e) {
               Log.e("Install Error", e.getMessage(), e);
-              CustomToast.showErrorToast(context, "无法自动安装更新包，请手动进行安装。");
+              CustomToast.showErrorToast(context, "无法自动安装更新包，请在通知栏手动进行安装。");
             }
           } else {
-            CustomToast.showSuccessToast(context, name + " 已经成功下载到 SD卡/H5mota 目录下！", 6000);
+            CustomToast.showSuccessToast(context, name + " 已经成功下载到 SD卡/Downloads 目录下！", 6000);
           }
         }
       }
