@@ -3,7 +3,9 @@ package com.h5mota;
 import android.app.DownloadManager;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.net.http.SslError;
@@ -56,11 +58,15 @@ public class WebActivity extends AppCompatActivity {
   private File LOG_FILE;
   private SimpleDateFormat simpleDateFormat;
   private JSInterface jsInterface;
+  private SharedPreferences preferences;
+  private boolean localSave;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_web);
+    preferences = getSharedPreferences("config", Context.MODE_PRIVATE);
+    localSave = preferences.getBoolean("local_save", true);
 
     File log_dir = getExternalFilesDir("_logs");
     if (!log_dir.exists() && !log_dir.mkdirs()) {
@@ -124,7 +130,9 @@ public class WebActivity extends AppCompatActivity {
             super.onPageFinished(view, url);
             progressBar.setVisibility(View.GONE);
             setTitle(webView.getTitle());
-            jsInterface.onWebViewPageLoaded();
+            if (localSave) {
+              jsInterface.onWebViewPageLoaded();
+            }
           }
 
           public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
@@ -209,6 +217,7 @@ public class WebActivity extends AppCompatActivity {
           public boolean onConsoleMessage(ConsoleMessage message) {
             if (LOG_FILE == null) return false;
             String msg = message.message();
+            Log.i("H5mota_WebActivity", msg);
             if (msg.equals("[object Object]")
                 || msg.equals("localForage supported!")
                 || msg.equals("插件编写测试")
@@ -330,7 +339,7 @@ public class WebActivity extends AppCompatActivity {
         .setIcon(android.R.drawable.ic_menu_rotate)
         .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
     menu.add(Menu.NONE, 1, 1, "")
-        .setIcon(android.R.drawable.ic_menu_delete)
+        .setIcon(android.R.drawable.ic_menu_manage)
         .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
     menu.add(Menu.NONE, 2, 2, "")
         .setIcon(android.R.drawable.ic_menu_close_clear_cancel)
@@ -345,31 +354,20 @@ public class WebActivity extends AppCompatActivity {
         webView.clearCache(true);
         webView.reload();
         break;
-      case 1: {
+      case 1:
         new AlertDialog.Builder(this)
-            .setItems(
-                new String[]{"清理在线垃圾存档", "清理离线垃圾存档"},
+            .setSingleChoiceItems(
+                new String[]{"启用本地化存档", "禁用本地化存档"},
+                localSave ? 0 : 1,
                 (dialogInterface, i) -> {
-                  if (i == 0) {
-                    webView.loadUrl(MainActivity.DOMAIN + "/clearStorage.php");
-                  } else if (i == 1) {
-                    File directory = getExternalFilesDir("towers");
-                    File clearFile = new File(directory, "clearStorage.html");
-                    if (!clearFile.exists()) {
-                      Utils.copyFilesFassets(
-                          WebActivity.this,
-                          "clearStorage.html",
-                          directory + "/clearStorage.html");
-                    }
-                    webView.loadUrl(MainActivity.LOCAL + "clearStorage.html");
-                  }
-                })
-            .setTitle("垃圾存档清理工具")
-            .setCancelable(true)
-            .create()
-            .show();
+                  localSave = i == 0;
+                  preferences.edit().putBoolean("local_save", localSave).apply();
+                  CustomToast.showSuccessToast(this, "本地化存档已" + (i == 0 ? "启用" : "禁用") + "！刷新页面后生效。");
+                }
+            )
+            .setPositiveButton("确定", null)
+            .setCancelable(true).show();
         break;
-      }
       case 2:
         webView.loadUrl("about:blank");
         finish();

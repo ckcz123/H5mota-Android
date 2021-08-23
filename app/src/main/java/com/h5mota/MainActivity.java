@@ -40,12 +40,14 @@ public class MainActivity extends AppCompatActivity {
   public File directory;
 
   SimpleWebServer simpleWebServer;
+  SharedPreferences preferences;
   double exittime = 0;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
+    preferences = getSharedPreferences("config", Context.MODE_PRIVATE);
 
     List<PermissionItem> list = new ArrayList<>();
     list.add(
@@ -258,7 +260,7 @@ public class MainActivity extends AppCompatActivity {
         .setIcon(android.R.drawable.ic_menu_set_as)
         .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
     menu.add(Menu.NONE, 1, 1, "")
-        .setIcon(android.R.drawable.ic_menu_delete)
+        .setIcon(android.R.drawable.ic_menu_manage)
         .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
     menu.add(Menu.NONE, 2, 2, "")
         .setIcon(android.R.drawable.ic_menu_close_clear_cancel)
@@ -272,23 +274,19 @@ public class MainActivity extends AppCompatActivity {
       case 0:
         inputLink();
         break;
-      case 1: {
+      case 1:
         new AlertDialog.Builder(this)
-            .setItems(
-                new String[]{"清理在线垃圾存档", "清理离线垃圾存档"},
+            .setSingleChoiceItems(
+                new String[]{"启用本地化存档", "禁用本地化存档"},
+                preferences.getBoolean("local_save", true) ? 0 : 1,
                 (dialogInterface, i) -> {
-                  if (i == 0) {
-                    loadUrl(DOMAIN + "/clearStorage.php", "清理在线垃圾存档");
-                  } else if (i == 1) {
-                    openDirectory(getExternalFilesDir("saves"));
-                  }
-                })
-            .setTitle("垃圾存档清理工具")
-            .setCancelable(true)
-            .create()
-            .show();
+                  preferences.edit().putBoolean("local_save", i == 0).apply();
+                  CustomToast.showSuccessToast(this, i == 0 ? "本地化存档已启用！" : "本地化存档已禁用！");
+                }
+            )
+            .setPositiveButton("确定", null)
+            .setCancelable(true).show();
         break;
-      }
       case 2:
         finish();
         break;
@@ -336,7 +334,6 @@ public class MainActivity extends AppCompatActivity {
   }
 
   private void testMigration() {
-    SharedPreferences preferences = getSharedPreferences("config", Context.MODE_PRIVATE);
     if (preferences.getBoolean("migration", false)) {
       return;
     }

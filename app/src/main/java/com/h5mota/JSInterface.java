@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Environment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
@@ -22,6 +23,8 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import me.weyye.hipermission.HiPermission;
 
@@ -171,7 +174,47 @@ public class JSInterface {
 
   @JavascriptInterface
   public void iterateLocalForage(int id) {
-    executeLocalForageIterate(id, saveDirectory.list());
+    executeLocalForageIterate(id, getAllSaves());
+  }
+
+  @JavascriptInterface
+  public void keysLocalForage(int id) {
+    List<String> names = getAllSaves();
+    StringBuilder builder = new StringBuilder();
+    builder.append('[');
+    boolean first = true;
+    for (String name : names) {
+      if (!first) builder.append(',');
+      builder.append(replaceContent(name));
+      first = false;
+    }
+    builder.append(']');
+    executeLocalForageCallback(id, null, builder.toString());
+  }
+
+  @JavascriptInterface
+  public void lengthLocalForage(int id) {
+    executeLocalForageCallback(id, null, String.valueOf(getAllSaves().size()));
+  }
+
+  private List<String> getAllSaves() {
+    File[] files = saveDirectory.listFiles();
+    if (files == null) {
+      return new ArrayList<>();
+    }
+    List<String> names = new ArrayList<>();
+    for (File f : files) {
+      if (f.isDirectory()) {
+        for (File f2 : f.listFiles()) {
+          if (f2 != null && f2.isFile()) {
+            names.add(f.getName() + "_" + f2.getName());
+          }
+        }
+      } else {
+        names.add(f.getName());
+      }
+    }
+    return names;
   }
 
   void onWebViewPageLoaded() {
@@ -185,6 +228,7 @@ public class JSInterface {
             "    if (Object.keys(core.saves.ids).length == 0 && window.jsinterface) {\n" +
             "      console.log('Forwarding localforage...');\n" +
             "      core.platform.useLocalForage = true;\n" +
+            "      Object.defineProperty(core.platform, 'useLocalForage', { writable: false });\n" +
             "      if (window.LZString) LZString.compress = function (s) { return s; };\n" +
             "      if (window.lzw_encode) lzw_encode = function (s) { return s; };\n" +
             "      localforage.setItem = function (name, data, callback) {\n" +
@@ -212,6 +256,16 @@ public class JSInterface {
             "        core['__iter' + id] = iter;\n" +
             "        core['__callback' + id] = callback;\n" +
             "        window.jsinterface.iterateLocalForage(id);\n" +
+            "      }\n" +
+            "      localforage.keys = function (callback) {\n" +
+            "        var id = setTimeout(null);\n" +
+            "        core['__callback' + id] = callback;\n" +
+            "        window.jsinterface.keysLocalForage(id);\n" +
+            "      }\n" +
+            "      localforage.length = function (callback) {\n" +
+            "        var id = setTimeout(null);\n" +
+            "        core['__callback' + id] = callback;\n" +
+            "        window.jsinterface.lengthLocalForage(id);\n" +
             "      }\n" +
             "      core.control.getSaveIndexes(function (indexes) {\n" +
             "        core.saves.ids = indexes;\n" +
@@ -243,7 +297,7 @@ public class JSInterface {
         "", null));
   }
 
-  private void executeLocalForageIterate(int id, String[] keys) {
+  private void executeLocalForageIterate(int id, List<String> keys) {
     StringBuilder builder = new StringBuilder();
     String iterName = "core.__iter" + id;
     builder.append("if (window.core && window.").append(iterName).append(") {\n");
