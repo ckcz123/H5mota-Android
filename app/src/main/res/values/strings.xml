@@ -1,3 +1,15 @@
-<resources>
-    <string name="app_name">HTML5魔塔安卓版</string>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">H5魔塔安卓版</string>
+    <string name="online_game">在线游戏</string>
+    <string name="forum">论坛交流</string>
+    <string name="offline_game">离线游戏</string>
+    <string name="download_message_prefix" tools:ignore="ExtraTranslation">文件已下载到</string>
+    <string name="browser_recommendation"  tools:ignore="ExtraTranslation">推荐使用ES文件浏览器打开目录</string>
+    <string name="download_scucess_notification_title"  tools:ignore="ExtraTranslation">文件下载成功</string>
+    <string name="download_failure"  tools:ignore="ExtraTranslation">下载失败！</string>
+    <string name="copy_to_clipboard_success"  tools:ignore="ExtraTranslation">已成功复制到剪切板</string>
+    <string name="choose_file"  tools:ignore="ExtraTranslation">请选择文件</string>
+    <string name="empty_game"  tools:ignore="ExtraTranslation">当前无离线游戏！\n在游戏详情页点击下载，将会自动下载离线游戏并显示在此处。</string>
+    <string name="grant_storage_permission"  tools:ignore="ExtraTranslation">授权存储权限</string>
+    <string name="offline_game_directory" tools:ignore="ExtraTranslation">离线游戏目录：手机存储/H5mota</string>
 </resources>
