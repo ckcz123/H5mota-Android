@@ -77,6 +77,7 @@ fun WebScreen(url: String) {
     var loading by remember { mutableStateOf(false) }
     var pageProgress by remember { mutableFloatStateOf(0f) }
     val activity = getMainActivity(LocalContext.current as ContextWrapper)
+    val saveDir = activity.getExternalFilesDir("saves")!!
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -102,6 +103,8 @@ fun WebScreen(url: String) {
                 override fun onPageFinished(view: WebView, url: String?) {
                     super.onPageFinished(view, url)
                     loading = false
+
+                    maybeInjectLocalForage(view, saveDir)
                 }
 
                 @SuppressLint("WebViewClientOnReceivedSslError")
@@ -135,11 +138,9 @@ fun WebScreen(url: String) {
                     AlertDialog.Builder(activity).setTitle("Javascript发来的提示")
                         .setMessage(message).setPositiveButton(
                             "OK"
-                        ) { _, _ -> result.confirm() }
-                        .setNegativeButton(
+                        ) { _, _ -> result.confirm() }.setNegativeButton(
                             "Cancel"
-                        ) { _, _ -> result.cancel() }
-                        .setCancelable(false).show()
+                        ) { _, _ -> result.cancel() }.setCancelable(false).show()
                     return true
                 }
 
@@ -158,8 +159,7 @@ fun WebScreen(url: String) {
                         result.confirm(et.text.toString())
                     }.setNegativeButton(
                         "Cancel"
-                    ) { _, _ -> result.cancel() }
-                        .setCancelable(false).show()
+                    ) { _, _ -> result.cancel() }.setCancelable(false).show()
                     return true
                 }
 
@@ -172,16 +172,14 @@ fun WebScreen(url: String) {
                     intent.type = "*/*"
                     activity.jsActivityLauncher.launch(
                         Intent.createChooser(
-                            intent,
-                            "请选择文件"
+                            intent, "请选择文件"
                         )
                     ) { result ->
                         if (result.resultCode != Activity.RESULT_OK) return@launch
 
                         filePathCallback.onReceiveValue(
                             WebChromeClient.FileChooserParams.parseResult(
-                                result.resultCode,
-                                result.data
+                                result.resultCode, result.data
                             )
                         )
                     }
@@ -236,7 +234,7 @@ fun WebScreen(url: String) {
             navigator = navigator,
             onCreated = { webView ->
                 webView.apply {
-                    addJavascriptInterface(JsInterface(activity, activity, this), "jsinterface")
+                    addJavascriptInterface(JsInterface(activity, saveDir, this), "jsinterface")
                     settings.apply {
                         javaScriptEnabled = true
                         javaScriptCanOpenWindowsAutomatically = true
@@ -257,16 +255,14 @@ fun WebScreen(url: String) {
 
                     setDownloadListener { url, _, contentDisposition, mimetype, _ ->
                         try {
-                            val request =
-                                DownloadManager.Request(Uri.parse(url))
+                            val request = DownloadManager.Request(Uri.parse(url))
                             Log.i("mimetype", mimetype)
                             request.setMimeType(mimetype)
                             request.allowScanningByMediaScanner()
                             request.setNotificationVisibility(
                                 DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED
                             )
-                            val filename =
-                                URLUtil.guessFileName(url, contentDisposition, mimetype)
+                            val filename = URLUtil.guessFileName(url, contentDisposition, mimetype)
                             val dir =
                                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
                             val file = File(dir, filename)
@@ -278,9 +274,7 @@ fun WebScreen(url: String) {
                                 activity.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager?
                             downloadManager!!.enqueue(request)
                             Toast.makeText(
-                                context,
-                                "文件下载中，请在通知栏查看进度",
-                                Toast.LENGTH_LONG
+                                context, "文件下载中，请在通知栏查看进度", Toast.LENGTH_LONG
                             ).show()
                         } catch (e: java.lang.Exception) {
                             Log.e("ERROR", "Error", e)
@@ -290,8 +284,7 @@ fun WebScreen(url: String) {
                             }
                             activity.startActivity(
                                 Intent(
-                                    Intent.ACTION_VIEW,
-                                    Uri.parse(url)
+                                    Intent.ACTION_VIEW, Uri.parse(url)
                                 )
                             )
                         }
@@ -309,13 +302,84 @@ fun WebScreen(url: String) {
     }
 }
 
-class JsInterface constructor(
-    private val activity: MainActivity,
-    private val context: Context,
-    private val webView: WebView
-) {
-    private val saveDir = activity.getExternalFilesDir("saves")!!
+fun maybeInjectLocalForage(view: WebView, saveDir: File) {
+    view.evaluateJavascript(
+        """
+            (function() {
+                if (!window.core || !window.core.plugin) return "";
+                if (!window.localforage || !window.jsinterface) return ""
+                if (core.utils._setLocalForage_set || !core.plugin._afterLoadResources) return "";
+                return core.firstData.name;
+            })()
+        """.trimIndent()
+    ) {
+        val name = it.replace("\"", "")
+        if (name.isEmpty()) return@evaluateJavascript
+        val f = File(saveDir, name)
+        if (!f.isDirectory || f.list { _, s -> s.startsWith("save") }
+                .isNullOrEmpty()) return@evaluateJavascript
+        Log.i("H5mota_WebActivity", "Inject localForage for $name...")
+        // Inject
+        view.evaluateJavascript(
+            """
+            (function () {              
+              var _afterLoadResources = core.plugin._afterLoadResources;
+              core.plugin._afterLoadResources = function () {
+                console.log('Forwarding localforage...');
+                core.platform.useLocalForage = true;
+                Object.defineProperty(core.platform, 'useLocalForage', { writable: false });
+                if (window.LZString) LZString.compress = function (s) { return s; };
+                if (window.lzw_encode) lzw_encode = function (s) { return s; };
+                localforage.setItem = function (name, data, callback) {
+                  var id = setTimeout(null);
+                  core['__callback' + id] = callback;
+                  window.jsinterface.setLocalForage(id, name, data);
+                }
+                localforage.getItem = function (name, callback) {
+                  var id = setTimeout(null);
+                  core['__callback' + id] = callback;
+                  window.jsinterface.getLocalForage(id, name);
+                }
+                localforage.removeItem = function (name, callback) {
+                  var id = setTimeout(null);
+                  core['__callback' + id] = callback;
+                  window.jsinterface.removeLocalForage(id, name);
+                }
+                localforage.clear = function (callback) {
+                  var id = setTimeout(null);
+                  core['__callback' + id] = callback;
+                  window.jsinterface.clearLocalForage(id);
+                }
+                localforage.iterate = function (iter, callback) {
+                  var id = setTimeout(null);
+                  core['__iter' + id] = iter;
+                  core['__callback' + id] = callback;
+                  window.jsinterface.iterateLocalForage(id);
+                }
+                localforage.keys = function (callback) {
+                  var id = setTimeout(null);
+                  core['__callback' + id] = callback;
+                  window.jsinterface.keysLocalForage(id);
+                }
+                localforage.length = function (callback) {
+                  var id = setTimeout(null);
+                  core['__callback' + id] = callback;
+                  window.jsinterface.lengthLocalForage(id);
+                }
+                core.control.getSaveIndexes(function (indexes) {
+                  core.saves.ids = indexes;
+                });
+              }
+              if (_afterLoadResources) _afterLoadResources.call(core.plugin);
+            })()
+                    """.trimIndent()
+        ) { Log.i("WebScreen", "Forward finished!") }
+    }
+}
 
+class JsInterface constructor(
+    private val activity: MainActivity, private val saveDir: File, private val webView: WebView
+) {
     init {
         if (!saveDir.exists()) {
             saveDir.mkdir();
@@ -333,17 +397,15 @@ class JsInterface constructor(
                 close()
             }
             val downloadPathMessage =
-                context.resources.getString(R.string.download_message_prefix) + file.absolutePath
+                activity.resources.getString(R.string.download_message_prefix) + file.absolutePath
             Toast.makeText(
-                activity,
-                downloadPathMessage,
-                Toast.LENGTH_SHORT
+                activity, downloadPathMessage, Toast.LENGTH_SHORT
             ).show()
         } catch (e: IOException) {
             Log.e("Error", "download error", e)
             Toast.makeText(
                 activity,
-                context.resources.getString(R.string.download_failure),
+                activity.resources.getString(R.string.download_failure),
                 Toast.LENGTH_SHORT
             ).show()
         }
@@ -356,7 +418,7 @@ class JsInterface constructor(
         );
         Toast.makeText(
             activity,
-            context.resources.getString(R.string.copy_to_clipboard_success),
+            activity.resources.getString(R.string.copy_to_clipboard_success),
             Toast.LENGTH_SHORT
         ).show()
     }
@@ -376,8 +438,7 @@ class JsInterface constructor(
                         val builder = java.lang.StringBuilder()
                         while (reader.readLine().also { line = it } != null) builder.append(line)
                         webView.evaluateJavascript(
-                            "core.readFileContent(" + replaceContent(builder.toString()) + ")",
-                            null
+                            "core.readFileContent(" + replaceContent(builder.toString()) + ")", null
                         )
                     }
                 }
@@ -452,8 +513,7 @@ class JsInterface constructor(
     }
 
     private fun getAllSaves(): List<String> {
-        val files: Array<File> = saveDir.listFiles()
-            ?: return ArrayList()
+        val files: Array<File> = saveDir.listFiles() ?: return ArrayList()
         val names: MutableList<String> = ArrayList()
         for (f in files) {
             if (f.isDirectory) {
@@ -513,10 +573,7 @@ class JsInterface constructor(
         builder.append("if (window.core && window.").append(iterName).append(") {\n")
         if (keys != null) {
             for (key in keys) {
-                builder.append("  ")
-                    .append(iterName)
-                    .append("(null, ")
-                    .append(replaceContent(key))
+                builder.append("  ").append(iterName).append("(null, ").append(replaceContent(key))
                     .append(");\n")
             }
         }
