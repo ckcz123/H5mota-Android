@@ -19,7 +19,10 @@ import java.io.File
 
 
 @Composable
-internal fun OfflineGameRoute(navController: NavHostController = rememberNavController()) {
+internal fun OfflineGameRoute(
+    navController: NavHostController = rememberNavController(),
+    onUrlLoaded: ((String?) -> Unit)? = null
+) {
     val games = mutableListOf<GameItem>()
     if (Constant.DIRECTORY.exists()) {
         for (file in Constant.DIRECTORY.listFiles()!!) {
@@ -48,7 +51,7 @@ internal fun OfflineGameRoute(navController: NavHostController = rememberNavCont
             }
         }
     }
-    GameNavHost(games, navController)
+    GameNavHost(games, navController, onUrlLoaded = onUrlLoaded)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -46,15 +46,19 @@ import java.io.File
 @Composable
 fun MotaApp(
     windowSizeClass: WindowSizeClass,
-    appState: MotaAppState = rememberMotaAppState(windowSizeClass = windowSizeClass, context= LocalContext.current),
+    appState: MotaAppState = rememberMotaAppState(
+        windowSizeClass = windowSizeClass,
+        context = LocalContext.current
+    ),
 ) {
+    var isPlayingGame by remember { mutableStateOf(false) }
     checkVersion()
     Scaffold(
         modifier = Modifier,
         containerColor = Color.Transparent,
         contentColor = MaterialTheme.colorScheme.onBackground,
         bottomBar = {
-            if (appState.shouldShowBottomBar) {
+            if (appState.shouldShowBottomBar && !isPlayingGame) {
                 MotaNavBar(
                     destinations = appState.topLevelDestinations,
                     onNavigateToDestination = appState::navigateToTopLevelDestination,
@@ -68,7 +72,7 @@ fun MotaApp(
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            if (appState.shouldShowNavRail) {
+            if (appState.shouldShowNavRail && !isPlayingGame) {
                 MotaNavRail(
                     destinations = appState.topLevelDestinations,
                     onNavigateToDestination = appState::navigateToTopLevelDestination,
@@ -77,7 +81,9 @@ fun MotaApp(
             }
 
             Column(Modifier.fillMaxSize()) {
-                MotaNavHost(appState = appState)
+                MotaNavHost(appState = appState, onUrlLoaded = {
+                    isPlayingGame = Constant.isPlayingGame(it)
+                })
             }
         }
     }
@@ -154,7 +160,8 @@ private fun downloadApk(activity: MainActivity, url: String) {
         request.setDestinationUri(Uri.fromFile(file))
         request.setTitle(filename)
         request.setDescription("文件保存在" + file.absolutePath)
-        val downloadManager = activity.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager?
+        val downloadManager =
+            activity.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager?
         downloadManager!!.enqueue(request)
         Toast.makeText(activity, "文件下载中，请在通知栏查看进度", Toast.LENGTH_LONG).show()
     } catch (e: Exception) {

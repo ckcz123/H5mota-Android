@@ -5,8 +5,8 @@ import androidx.navigation.compose.composable
 
 const val forumNavigationRoute = "forum_route"
 
-fun NavGraphBuilder.forumScreen() {
+fun NavGraphBuilder.forumScreen(onUrlLoaded: ((String?) -> Unit)? = null) {
     composable(route = forumNavigationRoute) {
-        ForumRoute()
+        ForumRoute(onUrlLoaded = onUrlLoaded)
     }
 }

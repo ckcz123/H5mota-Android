@@ -27,18 +27,10 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.widget.EditText
 import android.widget.Toast
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Refresh
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -46,10 +38,8 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import com.google.accompanist.web.AccompanistWebChromeClient
 import com.google.accompanist.web.AccompanistWebViewClient
 import com.google.accompanist.web.WebView
@@ -66,14 +56,12 @@ import java.io.FileWriter
 import java.io.IOException
 import java.io.InputStreamReader
 import java.io.PrintWriter
-import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Locale
 
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun WebScreen(url: String) {
+fun WebScreen(url: String, onUrlLoaded: ((String?) -> Unit)? = null) {
     var loading by remember { mutableStateOf(false) }
     var pageProgress by remember { mutableFloatStateOf(0f) }
     val activity = getMainActivity(LocalContext.current as ContextWrapper)
@@ -98,6 +86,7 @@ fun WebScreen(url: String) {
                 override fun onPageStarted(view: WebView, url: String?, favicon: Bitmap?) {
                     super.onPageStarted(view, url, favicon)
                     loading = true
+                    onUrlLoaded?.invoke(url)
                 }
 
                 override fun onPageFinished(view: WebView, url: String?) {
@@ -248,6 +237,7 @@ fun WebScreen(url: String) {
                         databaseEnabled = true
                         loadsImagesAutomatically = true
                         setNeedInitialFocus(true)
+
                     }
                     scrollBarStyle = View.SCROLLBARS_OUTSIDE_INSET
                     setLayerType(View.LAYER_TYPE_HARDWARE, null)
@@ -295,6 +285,7 @@ fun WebScreen(url: String) {
             },
             onDispose = { webView ->
                 webView.destroy()
+                onUrlLoaded?.invoke(null)
             },
             client = webClient,
             chromeClient = webChromeClient

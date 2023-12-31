@@ -1,20 +1,13 @@
 package com.h5mota.feature.offline_game
 
-import android.app.DownloadManager
 import android.content.ContextWrapper
-import android.content.Intent
-import android.net.Uri
-import android.os.Build
-import android.provider.DocumentsContract
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,11 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -37,7 +26,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.h5mota.MainActivity
 import com.h5mota.R
 import com.h5mota.core.component.WebScreen
 import com.h5mota.ui.Constant
@@ -47,15 +35,19 @@ import java.net.URLEncoder
 
 const val offlineGameListNavigationRoute = "offline_game_route"
 
-fun NavGraphBuilder.offlineGameListScreen() {
+fun NavGraphBuilder.offlineGameListScreen(onUrlLoaded: ((String?) -> Unit)? = null) {
     composable(route = offlineGameListNavigationRoute) {
-        OfflineGameRoute()
+        OfflineGameRoute(onUrlLoaded = onUrlLoaded)
     }
 }
 
 
 @Composable
-fun GameNavHost(games: List<GameItem>, navController: NavHostController) {
+fun GameNavHost(
+    games: List<GameItem>,
+    navController: NavHostController,
+    onUrlLoaded: ((String?) -> Unit)? = null
+) {
     NavHost(
         navController = navController,
         startDestination = "game_list",
@@ -114,7 +106,8 @@ fun GameNavHost(games: List<GameItem>, navController: NavHostController) {
                 WebScreen(
                     Constant.LOCAL + URLEncoder.encode(
                         game.uri, "utf-8"
-                    )
+                    ),
+                    onUrlLoaded = onUrlLoaded,
                 )
             }
         }

@@ -5,6 +5,6 @@ import com.h5mota.core.component.WebScreen
 
 
 @Composable
-internal fun ForumRoute() {
-    WebScreen(url = "https://h5mota.com/bbs")
+internal fun ForumRoute(onUrlLoaded: ((String?) -> Unit)? = null) {
+    WebScreen(url = "https://h5mota.com/bbs", onUrlLoaded = onUrlLoaded)
 }
