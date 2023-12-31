@@ -5,8 +5,8 @@ import androidx.navigation.compose.composable
 
 const val onlineGameNavigationRoute = "online_game_route"
 
-fun NavGraphBuilder.onlineGameScreen() {
+fun NavGraphBuilder.onlineGameScreen(onUrlLoaded: ((String?) -> Unit)? = null) {
     composable(route = onlineGameNavigationRoute) {
-        OnlineGameRoute()
+        OnlineGameRoute(onUrlLoaded)
     }
 }

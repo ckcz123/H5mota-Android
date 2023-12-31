@@ -106,7 +106,7 @@ fun NavController.navigateToScreen(
     context: Context
 ) {
     val activity = getMainActivity(context as ContextWrapper)
-    if (activity.webScreenLifeCycleHook.url?.matches(Regex("(https://h5mota.com/games/.+)|(${Constant.LOCAL}.+)")) == true) {
+    if (Constant.isPlayingGame(activity.webScreenLifeCycleHook.url)) {
         AlertDialog.Builder(activity).setTitle("请确认").setMessage("是否离开游戏页面")
             .setPositiveButton(
                 "OK"
@@ -172,6 +172,7 @@ fun MotaNavHost(
     appState: MotaAppState,
     modifier: Modifier = Modifier,
     startDestination: String = onlineGameNavigationRoute,
+    onUrlLoaded: ((String?) -> Unit)? = null,
 ) {
     val navController = appState.navController
     NavHost(
@@ -179,9 +180,9 @@ fun MotaNavHost(
         startDestination = startDestination,
         modifier = modifier,
     ) {
-        onlineGameScreen()
-        offlineGameListScreen()
-        forumScreen()
+        onlineGameScreen(onUrlLoaded = onUrlLoaded)
+        offlineGameListScreen(onUrlLoaded = onUrlLoaded)
+        forumScreen(onUrlLoaded = onUrlLoaded)
     }
 }
 
@@ -204,4 +205,8 @@ object Constant {
     val DIRECTORY = File(Environment.getExternalStorageDirectory(), "H5mota")
     val DATE_FORMATER = SimpleDateFormat("yyyy-MM-dd", Locale.SIMPLIFIED_CHINESE)
     const val APK_FILE = "H5mota.apk"
+
+    fun isPlayingGame(url: String?): Boolean {
+        return url.orEmpty().matches(Regex("($DOMAIN/games/.+)|($LOCAL.+)"))
+    }
 }

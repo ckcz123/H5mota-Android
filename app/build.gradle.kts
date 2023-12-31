@@ -11,8 +11,8 @@ android {
         applicationId = "com.h5mota"
         minSdk = 26
         targetSdk = 34
-        versionCode = 63
-        versionName = "3.0"
+        versionCode = 69
+        versionName = "3.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
