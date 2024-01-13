@@ -1,6 +1,10 @@
 package com.h5mota.feature.offline_game
 
+import android.app.AlertDialog
 import android.content.ContextWrapper
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,10 +20,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -79,10 +86,38 @@ fun GameNavHost(
                         .padding(10.dp)
                         .verticalScroll(rememberScrollState())
                 ) {
-                    Text(
-                        stringResource(R.string.offline_game_directory),
-                        modifier = Modifier.padding(bottom = 10.dp)
-                    )
+                    Text(stringResource(R.string.offline_game_directory),
+                        color = Color.Blue,
+                        textDecoration = TextDecoration.Underline,
+                        modifier = Modifier
+                            .padding(bottom = 10.dp)
+                            .clickable {
+                                AlertDialog
+                                    .Builder(activity)
+                                    .setTitle("即将打开目录...")
+                                    .setMessage(
+                                        "你确定要打开离线塔目录：手机存储/H5mota 吗？\n\n"
+                                                + "请注意：部分文件管理器（如系统自带的文件管理）"
+                                                + "可能打开时无法定位到正确的目录，请手动切换。\n"
+                                                + "强烈推荐安装【ES文件浏览器】以进行离线塔的管理！"
+                                    )
+                                    .setPositiveButton("确定") { _, _ ->
+                                        activity.startActivity(
+                                            Intent.createChooser(
+                                                Intent(Intent.ACTION_VIEW).setDataAndType(
+                                                    Uri.parse(Constant.DIRECTORY.absolutePath),
+                                                    "*/*"
+                                                ), "请选择文件管理器"
+                                            )
+                                        )
+                                    }
+                                    .setNegativeButton("取消") { _, _ ->
+                                        Unit
+                                    }
+                                    .setCancelable(true)
+                                    .show()
+
+                            })
 
                     if (games.isEmpty()) {
                         Column(

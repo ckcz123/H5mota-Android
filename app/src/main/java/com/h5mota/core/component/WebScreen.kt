@@ -13,6 +13,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.net.http.SslError
 import android.os.Environment
+import android.util.Base64
 import android.util.Log
 import android.view.View
 import android.webkit.ConsoleMessage
@@ -27,9 +28,16 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.widget.EditText
 import android.widget.Toast
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -38,8 +46,13 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
 import com.google.accompanist.web.AccompanistWebChromeClient
 import com.google.accompanist.web.AccompanistWebViewClient
 import com.google.accompanist.web.WebView
@@ -57,6 +70,7 @@ import java.io.IOException
 import java.io.InputStreamReader
 import java.io.PrintWriter
 import java.util.Date
+import kotlin.math.roundToInt
 
 
 @SuppressLint("SetJavaScriptEnabled")
@@ -66,6 +80,7 @@ fun WebScreen(url: String, onUrlLoaded: ((String?) -> Unit)? = null) {
     var pageProgress by remember { mutableFloatStateOf(0f) }
     val activity = getMainActivity(LocalContext.current as ContextWrapper)
     val saveDir = activity.getExternalFilesDir("saves")!!
+    var isPlayingGame by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -94,6 +109,7 @@ fun WebScreen(url: String, onUrlLoaded: ((String?) -> Unit)? = null) {
                     loading = false
 
                     maybeInjectLocalForage(view, saveDir)
+                    isPlayingGame = Constant.isPlayingGame(url) && url.orEmpty().startsWith(Constant.DOMAIN)
                 }
 
                 @SuppressLint("WebViewClientOnReceivedSslError")
@@ -291,6 +307,28 @@ fun WebScreen(url: String, onUrlLoaded: ((String?) -> Unit)? = null) {
             chromeClient = webChromeClient
         )
     }
+
+    if (isPlayingGame) {
+        Box(
+            modifier =
+            Modifier.fillMaxSize()
+        ) {
+            Icon(
+                Icons.Outlined.Refresh,
+                contentDescription = null,
+                tint = Color.LightGray,
+                modifier = Modifier
+                    .size(32.dp)
+                    .align(Alignment.BottomStart)
+                    .padding(5.dp)
+                    .clickable {
+                        activity.webScreenLifeCycleHook.view?.clearCache(true)
+                        activity.webScreenLifeCycleHook.view?.reload()
+                    },
+            )
+        }
+    }
+
 }
 
 fun maybeInjectLocalForage(view: WebView, saveDir: File) {
@@ -429,7 +467,13 @@ class JsInterface constructor(
                         val builder = java.lang.StringBuilder()
                         while (reader.readLine().also { line = it } != null) builder.append(line)
                         webView.evaluateJavascript(
-                            "core.readFileContent(" + replaceContent(builder.toString()) + ")", null
+                            "core.readFileContent("
+                                    + "core.decodeBase64('"
+                                    + Base64.encodeToString(
+                                builder.toString().toByteArray(),
+                                Base64.NO_WRAP
+                            )
+                                    + "'))", null
                         )
                     }
                 }
@@ -457,10 +501,15 @@ class JsInterface constructor(
     fun getLocalForage(id: Int, name: String) {
         try {
             BufferedReader(InputStreamReader(FileInputStream(getFile(name)))).use { bufferedReader ->
-                var line: String?
-                val builder = java.lang.StringBuilder()
-                while (bufferedReader.readLine().also { line = it } != null) builder.append(line)
-                executeLocalForageCallback(id, null, replaceContent(builder.toString()))
+                executeLocalForageCallback(
+                    id, null,
+                    "core.decodeBase64('" +
+                            Base64.encodeToString(
+                                bufferedReader.readText().toByteArray(),
+                                Base64.NO_WRAP
+                            )
+                            + "')"
+                )
             }
         } catch (e: IOException) {
             executeLocalForageCallback(id, null, null)
@@ -490,8 +539,10 @@ class JsInterface constructor(
         val builder = java.lang.StringBuilder().append('[')
         var first = true
         for (name in getAllSaves()) {
-            if (!first) builder.append(',')
-            builder.append(replaceContent(name))
+            if (!first) builder.append(", ")
+            builder.append("core.decodeBase64('")
+            builder.append(Base64.encodeToString(name.toByteArray(), Base64.NO_WRAP))
+            builder.append("'");
             first = false
         }
         builder.append(']')
@@ -564,8 +615,9 @@ class JsInterface constructor(
         builder.append("if (window.core && window.").append(iterName).append(") {\n")
         if (keys != null) {
             for (key in keys) {
-                builder.append("  ").append(iterName).append("(null, ").append(replaceContent(key))
-                    .append(");\n")
+                builder.append("  ").append(iterName).append("(null, core.decodeBase64('")
+                    .append(Base64.encodeToString(key.toByteArray(), Base64.NO_WRAP))
+                    .append("'));\n")
             }
         }
         builder.append("  delete ").append(iterName).append(";")
@@ -575,9 +627,9 @@ class JsInterface constructor(
         }
     }
 
-    private fun replaceContent(content: String): String {
-        return "'" + content.replace("'".toRegex(), "\"").replace("\n".toRegex(), "\\n") + "'"
-    }
+    // private fun replaceContent(content: String): String {
+    //     return "'" + content.replace("'".toRegex(), "\"").replace("\n".toRegex(), "\\n") + "'"
+    // }
 }
 
 

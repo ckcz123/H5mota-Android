@@ -1,9 +1,10 @@
 package com.h5mota
 
+import android.app.AlertDialog
 import android.content.Intent
-import android.content.res.Configuration
+import android.net.Uri
 import android.os.Bundle
-import android.view.View
+import android.os.Environment
 import android.webkit.WebView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -115,6 +116,22 @@ class MainActivity : ComponentActivity() {
 
         if (!DIRECTORY.exists()) {
             DIRECTORY.mkdir()
+            File(DIRECTORY, ".nomedia").createNewFile()
+        } else if (!File(DIRECTORY, ".nomedia").exists()) {
+            AlertDialog
+                .Builder(this)
+                .setTitle("提示")
+                .setMessage("这个版本开始，离线塔目录下的图片不会被索引到图库中。\n\n" +
+                        "对于已经被索引的图片，可以采用如下方法进行处理：\n" +
+                        "1. 使用文件管理器打开手机存储，找到 H5mota 目录\n" +
+                        "2. 将其重命名，例如 H5mota1\n" +
+                        "3. 打开图库，确认已经被索引的图片消失\n" +
+                        "4. 将目录重命名回 H5mota 即可\n" +
+                        "如有问题可在论坛或群里进行反馈。")
+                .setCancelable(true)
+                .setPositiveButton("确定", null)
+                .show()
+            File(DIRECTORY, ".nomedia").createNewFile()
         }
 
         try {
@@ -125,7 +142,9 @@ class MainActivity : ComponentActivity() {
             simpleWebServer = null
         }
 
-        maybeMigrateLegacyTowers()
+        Thread {
+            maybeMigrateLegacyTowers()
+        } .start()
     }
 
     fun maybeMigrateLegacyTowers() {
