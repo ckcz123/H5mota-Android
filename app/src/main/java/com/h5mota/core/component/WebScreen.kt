@@ -542,7 +542,7 @@ class JsInterface constructor(
             if (!first) builder.append(", ")
             builder.append("core.decodeBase64('")
             builder.append(Base64.encodeToString(name.toByteArray(), Base64.NO_WRAP))
-            builder.append("'");
+            builder.append("')");
             first = false
         }
         builder.append(']')
