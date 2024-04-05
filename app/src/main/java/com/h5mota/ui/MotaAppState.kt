@@ -207,6 +207,9 @@ object Constant {
     const val APK_FILE = "H5mota.apk"
 
     fun isPlayingGame(url: String?): Boolean {
-        return url.orEmpty().matches(Regex("($DOMAIN/games/.+)|($LOCAL.+)"))
+        return url.orEmpty().let {
+            if (it.startsWith("$DOMAIN/games/")) true
+            else it.startsWith(LOCAL)
+        }
     }
 }

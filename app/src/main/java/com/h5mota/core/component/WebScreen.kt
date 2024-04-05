@@ -9,6 +9,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
 import android.net.Uri
 import android.net.http.SslError
@@ -31,28 +32,31 @@ import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.FlipCameraAndroid
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.google.accompanist.web.AccompanistWebChromeClient
 import com.google.accompanist.web.AccompanistWebViewClient
 import com.google.accompanist.web.WebView
@@ -70,7 +74,7 @@ import java.io.IOException
 import java.io.InputStreamReader
 import java.io.PrintWriter
 import java.util.Date
-import kotlin.math.roundToInt
+import java.util.function.Consumer
 
 
 @SuppressLint("SetJavaScriptEnabled")
@@ -81,6 +85,32 @@ fun WebScreen(url: String, onUrlLoaded: ((String?) -> Unit)? = null) {
     val activity = getMainActivity(LocalContext.current as ContextWrapper)
     val saveDir = activity.getExternalFilesDir("saves")!!
     var isPlayingGame by remember { mutableStateOf(false) }
+    var defaultOrientation by remember { mutableIntStateOf(-100) }
+    var gameName by remember { mutableStateOf("") }
+
+    fun setOrientation(orientation: Int?) {
+        if (defaultOrientation == -100) {
+            defaultOrientation = activity.requestedOrientation
+        }
+
+        if (orientation == null) {
+            if (activity.requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE) {
+                activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+            } else {
+                activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+            }
+            return
+        }
+
+        activity.requestedOrientation = orientation
+    }
+
+    fun resetOrientation() {
+        if (defaultOrientation != -100) {
+            activity.requestedOrientation = defaultOrientation
+            defaultOrientation = -100
+        }
+    }
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -109,7 +139,8 @@ fun WebScreen(url: String, onUrlLoaded: ((String?) -> Unit)? = null) {
                     loading = false
 
                     maybeInjectLocalForage(view, saveDir)
-                    isPlayingGame = Constant.isPlayingGame(url) && url.orEmpty().startsWith(Constant.DOMAIN)
+                    gameName = view.title.orEmpty().removeSuffix(" - HTML5魔塔")
+                    isPlayingGame = Constant.isPlayingGame(url)
                 }
 
                 @SuppressLint("WebViewClientOnReceivedSslError")
@@ -239,7 +270,7 @@ fun WebScreen(url: String, onUrlLoaded: ((String?) -> Unit)? = null) {
             navigator = navigator,
             onCreated = { webView ->
                 webView.apply {
-                    addJavascriptInterface(JsInterface(activity, saveDir, this), "jsinterface")
+                    addJavascriptInterface(JsInterface(activity, saveDir, this) { setOrientation(it) }, "jsinterface")
                     settings.apply {
                         javaScriptEnabled = true
                         javaScriptCanOpenWindowsAutomatically = true
@@ -302,6 +333,7 @@ fun WebScreen(url: String, onUrlLoaded: ((String?) -> Unit)? = null) {
             onDispose = { webView ->
                 webView.destroy()
                 onUrlLoaded?.invoke(null)
+                resetOrientation()
             },
             client = webClient,
             chromeClient = webChromeClient
@@ -313,6 +345,15 @@ fun WebScreen(url: String, onUrlLoaded: ((String?) -> Unit)? = null) {
             modifier =
             Modifier.fillMaxSize()
         ) {
+            Text(
+                gameName,
+                color = Color.LightGray,
+                fontSize = 12.sp,
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(5.dp)
+                    .absoluteOffset(5.dp, (-32).dp)
+            )
             Icon(
                 Icons.Outlined.Refresh,
                 contentDescription = null,
@@ -326,9 +367,23 @@ fun WebScreen(url: String, onUrlLoaded: ((String?) -> Unit)? = null) {
                         activity.webScreenLifeCycleHook.view?.reload()
                     },
             )
+            Icon(
+                Icons.Outlined.FlipCameraAndroid,
+                contentDescription = null,
+                tint = Color.LightGray,
+                modifier = Modifier
+                    .size(32.dp)
+                    .align(Alignment.BottomStart)
+                    .absoluteOffset(32.dp)
+                    .padding(5.dp)
+                    .clickable { setOrientation(null) },
+            )
         }
     }
 
+    if (!isPlayingGame) {
+        resetOrientation()
+    }
 }
 
 fun maybeInjectLocalForage(view: WebView, saveDir: File) {
@@ -407,7 +462,8 @@ fun maybeInjectLocalForage(view: WebView, saveDir: File) {
 }
 
 class JsInterface constructor(
-    private val activity: MainActivity, private val saveDir: File, private val webView: WebView
+    private val activity: MainActivity, private val saveDir: File, private val webView: WebView,
+    private val requestOrientation: Consumer<Int>,
 ) {
     init {
         if (!saveDir.exists()) {
@@ -554,6 +610,16 @@ class JsInterface constructor(
         executeLocalForageCallback(id, null, getAllSaves().size.toString())
     }
 
+    @JavascriptInterface
+    fun requestLandscape() {
+        this.requestOrientation.accept(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE)
+    }
+
+    @JavascriptInterface
+    fun requestPortrait() {
+        this.requestOrientation.accept(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT)
+    }
+
     private fun getAllSaves(): List<String> {
         val files: Array<File> = saveDir.listFiles() ?: return ArrayList()
         val names: MutableList<String> = ArrayList()
@@ -626,10 +692,6 @@ class JsInterface constructor(
             webView.evaluateJavascript(builder.toString()) { executeLocalForageCallback(id) }
         }
     }
-
-    // private fun replaceContent(content: String): String {
-    //     return "'" + content.replace("'".toRegex(), "\"").replace("\n".toRegex(), "\\n") + "'"
-    // }
 }
 
 

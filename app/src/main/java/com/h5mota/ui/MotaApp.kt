@@ -97,26 +97,28 @@ private fun checkVersion() {
     if (!threadStarted) {
         threadStarted = true
         Thread {
-            val okHttpClient = OkHttpClient()
-                .newBuilder()
-                .followRedirects(true)
-                .followSslRedirects(true)
-                .build()
-            okHttpClient
-                .newCall(
-                    Request.Builder()
-                        .url("${Constant.DOMAIN}/games/_client/?version=${BuildConfig.VERSION_NAME}")
-                        .build()
-                )
-                .execute().use { response ->
-                    val s = response.body!!.string()
-                    val jsonObject = JSONObject(s)
-                    val androidInfo = jsonObject.getJSONObject("android")
-                    val versionCode = androidInfo.getInt("version_code")
-                    if (versionCode > BuildConfig.VERSION_CODE) {
-                        updatedInfo = androidInfo
+            runCatching {
+                val okHttpClient = OkHttpClient()
+                    .newBuilder()
+                    .followRedirects(true)
+                    .followSslRedirects(true)
+                    .build()
+                okHttpClient
+                    .newCall(
+                        Request.Builder()
+                            .url("${Constant.DOMAIN}/games/_client/?version=${BuildConfig.VERSION_NAME}")
+                            .build()
+                    )
+                    .execute().use { response ->
+                        val s = response.body!!.string()
+                        val jsonObject = JSONObject(s)
+                        val androidInfo = jsonObject.getJSONObject("android")
+                        val versionCode = androidInfo.getInt("version_code")
+                        if (versionCode > BuildConfig.VERSION_CODE) {
+                            updatedInfo = androidInfo
+                        }
                     }
-                }
+            }
         }.start()
     }
 
