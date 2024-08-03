@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.ContextWrapper
 import android.os.Environment
+import android.util.Log
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
@@ -169,6 +170,7 @@ fun rememberMotaAppState(
  */
 @Composable
 fun MotaNavHost(
+    domain: String,
     appState: MotaAppState,
     modifier: Modifier = Modifier,
     startDestination: String = onlineGameNavigationRoute,
@@ -180,9 +182,9 @@ fun MotaNavHost(
         startDestination = startDestination,
         modifier = modifier,
     ) {
-        onlineGameScreen(onUrlLoaded = onUrlLoaded)
+        onlineGameScreen(url = "${domain}/", onUrlLoaded = onUrlLoaded)
         offlineGameListScreen(onUrlLoaded = onUrlLoaded)
-        forumScreen(onUrlLoaded = onUrlLoaded)
+        forumScreen(url = "${domain}/bbs", onUrlLoaded = onUrlLoaded)
     }
 }
 
@@ -198,7 +200,8 @@ fun getMainActivity(context: ContextWrapper): MainActivity {
 }
 
 object Constant {
-    const val DOMAIN = "https://h5mota.com"
+    var DOMAIN = "https://h5mota.com"
+    const val PRESS_DOMAIN = "https://mota.press"
     const val LOCAL_HOST = "127.0.0.1"
     const val LOCAL_PORT = 1055
     const val LOCAL = "http://${LOCAL_HOST}:${LOCAL_PORT}/"
@@ -211,5 +214,9 @@ object Constant {
             if (it.startsWith("$DOMAIN/games/")) true
             else it.startsWith(LOCAL)
         }
+    }
+
+    fun changeDomain(url: String) {
+        DOMAIN = url;
     }
 }

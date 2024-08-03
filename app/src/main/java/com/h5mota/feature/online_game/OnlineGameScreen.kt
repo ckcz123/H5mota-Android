@@ -4,11 +4,11 @@ import androidx.compose.runtime.Composable
 import com.h5mota.core.component.WebScreen
 
 @Composable
-internal fun OnlineGameRoute(onUrlLoaded: ((String?) -> Unit)? = null) {
-    OnlineGameScreen(onUrlLoaded)
+internal fun OnlineGameRoute(url: String, onUrlLoaded: ((String?) -> Unit)? = null) {
+    OnlineGameScreen(url, onUrlLoaded)
 }
 
 @Composable
-internal fun OnlineGameScreen(onUrlLoaded: ((String?) -> Unit)? = null) {
-    WebScreen("https://h5mota.com/", onUrlLoaded)
+internal fun OnlineGameScreen(url: String, onUrlLoaded: ((String?) -> Unit)? = null) {
+    WebScreen(url, onUrlLoaded)
 }
