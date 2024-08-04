@@ -267,6 +267,10 @@ fun WebScreen(url: String, onUrlLoaded: ((String?) -> Unit)? = null) {
             val bundle = state.viewState
             if (bundle == null) navigator.loadUrl(url)
         }
+        
+        LaunchedEffect(url) {
+            navigator.loadUrl(url)
+        }
 
         WebView(
             state = state,

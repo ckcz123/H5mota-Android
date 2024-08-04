@@ -39,6 +39,7 @@ import com.h5mota.core.component.MotaNavigationRailItem
 import com.h5mota.ui.Constant.APK_FILE
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 
@@ -51,8 +52,12 @@ fun MotaApp(
         context = LocalContext.current
     ),
 ) {
+    var domain by remember { mutableStateOf(Constant.DOMAIN) }
     var isPlayingGame by remember { mutableStateOf(false) }
     checkVersion()
+    checkSiteBackup(onChange = { backUpDomain ->
+        domain = backUpDomain
+    })
     Scaffold(
         modifier = Modifier,
         containerColor = Color.Transparent,
@@ -81,11 +86,85 @@ fun MotaApp(
             }
 
             Column(Modifier.fillMaxSize()) {
-                MotaNavHost(appState = appState, onUrlLoaded = {
+                MotaNavHost(domain = domain, appState = appState, onUrlLoaded = {
                     isPlayingGame = Constant.isPlayingGame(it)
                 })
             }
         }
+    }
+}
+
+private fun checkDomainAvailable(domain: String): Boolean {
+    val result = runCatching {
+        val okHttpClient = OkHttpClient()
+            .newBuilder()
+            .followRedirects(true)
+            .followSslRedirects(true)
+            .build()
+        okHttpClient
+            .newCall(
+                Request.Builder()
+                    .url("${domain}/backend/backup/now-available")
+                    .build()
+            )
+            .execute().use { response ->
+                val s = response.body!!.string()
+                s == "true"
+            }
+    }
+    return result.getOrDefault(false)
+}
+
+private fun getBackupDomains(): List<String> {
+    val result = runCatching {
+        val okHttpClient = OkHttpClient()
+            .newBuilder()
+            .followRedirects(true)
+            .followSslRedirects(true)
+            .build()
+        okHttpClient
+            .newCall(
+                Request.Builder()
+                    .url("${Constant.PRESS_DOMAIN}/proxy_backend/backup/domains")
+                    .build()
+            )
+            .execute().use { response ->
+                val s = response.body!!.string()
+                val domainArray = JSONArray(s)
+                (0 until domainArray.length()).map { i ->
+                    val domainObject = domainArray.getJSONObject(i)
+                    domainObject.getString("domain")
+                }
+            }
+    }
+    val domains = result.getOrDefault(listOf<String>())
+    return domains
+}
+
+@Composable
+private fun checkSiteBackup(onChange: (String) -> Unit) {
+    var availableDomain by remember { mutableStateOf(Constant.DOMAIN) }
+    var threadStarted by remember { mutableStateOf(false) }
+    if (!threadStarted) {
+        threadStarted = true
+        Thread {
+            if (checkDomainAvailable(Constant.DOMAIN)) {
+                return@Thread;
+            }
+            val domains = getBackupDomains()
+            for (domain in domains) {
+                if (!checkDomainAvailable((domain))) {
+                    availableDomain = domain
+                }
+                break
+            }
+        }.start()
+    }
+    if (availableDomain != Constant.DOMAIN) {
+        val activity = getMainActivity(LocalContext.current as ContextWrapper)
+        Toast.makeText(activity, "${Constant.DOMAIN}无法访问，切换至备份站点 $availableDomain", Toast.LENGTH_LONG).show()
+        Constant.changeDomain(availableDomain)
+        onChange(availableDomain)
     }
 }
 
@@ -106,7 +185,7 @@ private fun checkVersion() {
                 okHttpClient
                     .newCall(
                         Request.Builder()
-                            .url("${Constant.DOMAIN}/games/_client/?version=${BuildConfig.VERSION_NAME}")
+                            .url("${Constant.PRESS_DOMAIN}/proxy_backend/client/version.php?version=${BuildConfig.VERSION_NAME}")
                             .build()
                     )
                     .execute().use { response ->
