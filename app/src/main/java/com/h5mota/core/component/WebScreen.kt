@@ -84,7 +84,7 @@ fun WebScreen(url: String, onUrlLoaded: ((String?) -> Unit)? = null) {
     var pageProgress by remember { mutableFloatStateOf(0f) }
     val activity = getMainActivity(LocalContext.current as ContextWrapper)
     val saveDir = activity.getExternalFilesDir("saves")!!
-    var isPlayingGame by remember { mutableStateOf(false) }
+    // var isPlayingGame by remember { mutableStateOf(false) }
     var defaultOrientation by remember { mutableIntStateOf(-100) }
     var gameName by remember { mutableStateOf("") }
 
@@ -131,6 +131,7 @@ fun WebScreen(url: String, onUrlLoaded: ((String?) -> Unit)? = null) {
                 override fun onPageStarted(view: WebView, url: String?, favicon: Bitmap?) {
                     super.onPageStarted(view, url, favicon)
                     loading = true
+                    gameName = ""
                     onUrlLoaded?.invoke(url)
                 }
 
@@ -139,8 +140,11 @@ fun WebScreen(url: String, onUrlLoaded: ((String?) -> Unit)? = null) {
                     loading = false
 
                     maybeInjectLocalForage(view, saveDir)
-                    gameName = view.title.orEmpty().removeSuffix(" - HTML5魔塔")
-                    isPlayingGame = Constant.isPlayingGame(url)
+                    gameName =
+                        if (Constant.isPlayingGame(url))
+                            view.title.orEmpty().removeSuffix(" - HTML5魔塔")
+                        else ""
+                    // isPlayingGame = Constant.isPlayingGame(url)
                 }
 
                 @SuppressLint("WebViewClientOnReceivedSslError")
@@ -340,49 +344,46 @@ fun WebScreen(url: String, onUrlLoaded: ((String?) -> Unit)? = null) {
         )
     }
 
-    if (isPlayingGame) {
-        Box(
-            modifier =
-            Modifier.fillMaxSize()
-        ) {
-            Text(
-                gameName,
-                color = Color.LightGray,
-                fontSize = 12.sp,
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(5.dp)
-                    .absoluteOffset(5.dp, (-32).dp)
-            )
-            Icon(
-                Icons.Outlined.Refresh,
-                contentDescription = null,
-                tint = Color.LightGray,
-                modifier = Modifier
-                    .size(32.dp)
-                    .align(Alignment.BottomStart)
-                    .padding(5.dp)
-                    .clickable {
-                        activity.webScreenLifeCycleHook.view?.clearCache(true)
-                        activity.webScreenLifeCycleHook.view?.reload()
-                    },
-            )
-            Icon(
-                Icons.Outlined.FlipCameraAndroid,
-                contentDescription = null,
-                tint = Color.LightGray,
-                modifier = Modifier
-                    .size(32.dp)
-                    .align(Alignment.BottomStart)
-                    .absoluteOffset(32.dp)
-                    .padding(5.dp)
-                    .clickable { setOrientation(null) },
-            )
-        }
-    }
-
-    if (!isPlayingGame) {
-        resetOrientation()
+    Box(
+        modifier =
+        Modifier.fillMaxSize()
+    ) {
+        Text(
+            gameName,
+            color = Color.LightGray,
+            fontSize = 12.sp,
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(5.dp)
+                .absoluteOffset(10.dp, (-32).dp)
+        )
+        Icon(
+            Icons.Outlined.Refresh,
+            contentDescription = null,
+            tint = Color.LightGray,
+            modifier = Modifier
+                .size(32.dp)
+                .align(Alignment.BottomStart)
+                .absoluteOffset(5.dp, (-5).dp)
+                .padding(5.dp)
+                .clickable {
+                    activity.webScreenLifeCycleHook.view?.apply {
+                        clearCache(true)
+                        reload()
+                    }
+                },
+        )
+        Icon(
+            Icons.Outlined.FlipCameraAndroid,
+            contentDescription = null,
+            tint = Color.LightGray,
+            modifier = Modifier
+                .size(32.dp)
+                .align(Alignment.BottomStart)
+                .absoluteOffset(37.dp, (-5).dp)
+                .padding(5.dp)
+                .clickable { setOrientation(null) },
+        )
     }
 }
 
@@ -652,13 +653,13 @@ class JsInterface constructor(
     }
 
     private fun getFile(name: String): File {
-        val index = name.indexOf('_')
-        if (index > 0 && index < name.length - 1) {
-            val dir = File(saveDir, name.substring(0, index))
+        val group = "^(.+)_(save\\d+|autoSave)$".toRegex().find(name)?.groupValues
+        if (group != null && group.size >= 3) {
+            val dir = File(saveDir, group[1])
             if (!dir.exists()) {
                 dir.mkdir()
             }
-            return File(dir, name.substring(index + 1))
+            return File(dir, group[2])
         }
         return File(saveDir, name)
     }
