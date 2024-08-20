@@ -3,6 +3,7 @@
     <string name="online_game">在线游戏</string>
     <string name="forum">论坛交流</string>
     <string name="offline_game">离线游戏</string>
+    <string name="setting">设置</string>
     <string name="download_message_prefix" tools:ignore="ExtraTranslation">文件已下载到</string>
     <string name="browser_recommendation"  tools:ignore="ExtraTranslation">推荐使用ES文件浏览器打开目录</string>
     <string name="download_scucess_notification_title"  tools:ignore="ExtraTranslation">文件下载成功</string>

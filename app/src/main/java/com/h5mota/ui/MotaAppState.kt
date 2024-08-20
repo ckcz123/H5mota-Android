@@ -26,12 +26,15 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import com.h5mota.MainActivity
+import com.h5mota.core.base.Constant
 import com.h5mota.feature.forum.forumNavigationRoute
 import com.h5mota.feature.forum.forumScreen
 import com.h5mota.feature.offline_game.offlineGameListNavigationRoute
 import com.h5mota.feature.offline_game.offlineGameListScreen
 import com.h5mota.feature.online_game.onlineGameNavigationRoute
 import com.h5mota.feature.online_game.onlineGameScreen
+import com.h5mota.feature.setting.settingNavigationRoute
+import com.h5mota.feature.setting.settingScreen
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -96,6 +99,12 @@ class MotaAppState(
                     topLevelNavOptions,
                     context
                 )
+
+                TopLevelDestination.SETTING -> navController.navigateToScreen(
+                    settingNavigationRoute,
+                    topLevelNavOptions,
+                    context
+                )
             }
         }
     }
@@ -143,6 +152,12 @@ enum class TopLevelDestination(
         iconTextId = R.string.forum,
         titleTextId = R.string.forum,
     ),
+    SETTING(
+        selectedIcon = MotaIcons.Setting,
+        unselectedIcon = MotaIcons.Setting,
+        iconTextId = R.string.setting,
+        titleTextId = R.string.setting,
+    )
 }
 
 @Composable
@@ -185,6 +200,7 @@ fun MotaNavHost(
         onlineGameScreen(url = "${domain}/", onUrlLoaded = onUrlLoaded)
         offlineGameListScreen(onUrlLoaded = onUrlLoaded)
         forumScreen(url = "${domain}/bbs", onUrlLoaded = onUrlLoaded)
+        settingScreen()
     }
 }
 
@@ -197,26 +213,4 @@ fun getMainActivity(context: ContextWrapper): MainActivity {
         ctx = ctx.baseContext
     }
     throw IllegalStateException("Unable to find main activity!")
-}
-
-object Constant {
-    var DOMAIN = "https://h5mota.com"
-    const val PRESS_DOMAIN = "https://mota.press"
-    const val LOCAL_HOST = "127.0.0.1"
-    const val LOCAL_PORT = 1055
-    const val LOCAL = "http://${LOCAL_HOST}:${LOCAL_PORT}/"
-    val DIRECTORY = File(Environment.getExternalStorageDirectory(), "H5mota")
-    val DATE_FORMATER = SimpleDateFormat("yyyy-MM-dd", Locale.SIMPLIFIED_CHINESE)
-    const val APK_FILE = "H5mota.apk"
-
-    fun isPlayingGame(url: String?): Boolean {
-        return url.orEmpty().let {
-            if (it.startsWith("$DOMAIN/games/")) true
-            else it.startsWith(LOCAL)
-        }
-    }
-
-    fun changeDomain(url: String) {
-        DOMAIN = url;
-    }
 }

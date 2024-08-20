@@ -13,7 +13,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.h5mota.ui.Constant
+import com.h5mota.core.base.Constant
 import org.json.JSONObject
 import java.io.File
 

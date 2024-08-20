@@ -108,16 +108,23 @@ fun MotaNavigationRailItem(
 @Preview
 @Composable
 fun MotaNavigationPreview() {
-    val items = listOf(stringResource(R.string.online_game), stringResource(R.string.offline_game), stringResource(R.string.forum))
+    val items = listOf(
+        stringResource(R.string.online_game),
+        stringResource(R.string.offline_game),
+        stringResource(R.string.forum),
+        stringResource(R.string.setting),
+    )
     val icons = listOf(
         MotaIcons.VideogameAsset,
         MotaIcons.VideogameAssetOff,
         MotaIcons.Forum,
+        MotaIcons.Setting,
     )
     val selectedIcons = listOf(
         MotaIcons.VideogameAsset,
         MotaIcons.VideogameAssetOff,
         MotaIcons.Forum,
+        MotaIcons.Setting,
     )
 
     MotaAndroidTheme{

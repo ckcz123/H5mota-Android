@@ -35,7 +35,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.h5mota.R
 import com.h5mota.core.component.WebScreen
-import com.h5mota.ui.Constant
+import com.h5mota.core.base.Constant
 import com.h5mota.ui.getMainActivity
 import java.net.URLEncoder
 

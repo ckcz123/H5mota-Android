@@ -1,12 +1,13 @@
 package com.h5mota.core.server
 
 import android.util.Log
-import com.h5mota.ui.Constant
+import com.h5mota.core.base.Constant
 import fi.iki.elonen.NanoHTTPD
 import fi.iki.elonen.SimpleWebServer;
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import useHttpClientBuilder
 import java.io.File
 import java.io.IOException
 
@@ -31,7 +32,7 @@ class MotaWebServer(
             } catch (e: IOException) {
                 Log.e("Parse Body", "error", e)
             }
-            val okHttpClient = OkHttpClient().newBuilder().build()
+            val okHttpClient = useHttpClientBuilder().build()
             val formBody = FormBody.Builder()
             val map: Map<String, List<String>> = session.getParameters()
             println("========> $map")

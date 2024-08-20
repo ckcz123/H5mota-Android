@@ -18,6 +18,7 @@ import android.util.Base64
 import android.util.Log
 import android.view.View
 import android.webkit.ConsoleMessage
+import android.webkit.CookieManager
 import android.webkit.JavascriptInterface
 import android.webkit.JsPromptResult
 import android.webkit.JsResult
@@ -25,6 +26,8 @@ import android.webkit.SslErrorHandler
 import android.webkit.URLUtil
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.widget.EditText
@@ -64,8 +67,18 @@ import com.google.accompanist.web.rememberSaveableWebViewState
 import com.google.accompanist.web.rememberWebViewNavigator
 import com.h5mota.MainActivity
 import com.h5mota.R
-import com.h5mota.ui.Constant
+import com.h5mota.core.base.Constant
 import com.h5mota.ui.getMainActivity
+import okhttp3.Headers
+import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONArray
+import useHttpClientBuilder
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileInputStream
@@ -75,7 +88,6 @@ import java.io.InputStreamReader
 import java.io.PrintWriter
 import java.util.Date
 import java.util.function.Consumer
-
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
@@ -128,6 +140,69 @@ fun WebScreen(url: String, onUrlLoaded: ((String?) -> Unit)? = null) {
 
         val webClient = remember {
             object : AccompanistWebViewClient() {
+                override fun shouldInterceptRequest(
+                    view: WebView?,
+                    request: WebResourceRequest?
+                ): WebResourceResponse? {
+                    if (request == null) {
+                        return null;
+                    }
+                    val domain = "${request.url.scheme}://${request.url.host}"
+                    val bodyType = request.requestHeaders[hackBodyTypeKey]
+                    if (bodyType != null) {
+                        request.requestHeaders.remove(hackBodyTypeKey)
+                    }
+                    val bodyContent = request.requestHeaders[hackBodyContentKey]
+                    if (bodyContent != null) {
+                        request.requestHeaders.remove(hackBodyContentKey)
+                    }
+                    if (Constant.USE_PROXY && domain == Constant.DOMAIN) {
+                        try {
+                            val proxyRequest = Request.Builder().url(request.url.toString())
+                            request.requestHeaders.forEach {
+                                (name, value) -> proxyRequest.addHeader(name, value)
+                            }
+                            if (bodyType != null && bodyContent != null) {
+                                if (bodyType == "Body") {
+                                    proxyRequest.post(
+                                        bodyContent.toRequestBody("application/json".toMediaTypeOrNull())
+                                    )
+                                } else {
+                                    val body = MultipartBody.Builder()
+                                        .setType(MultipartBody.FORM)
+                                    val bodyContentEntries = JSONArray(bodyContent)
+                                    for (i in 0 until bodyContentEntries.length()) {
+                                        val bodyContentEntry = bodyContentEntries.get(i) as JSONArray
+                                        val name = bodyContentEntry.get(0) as String
+                                        val value = bodyContentEntry.get(1) as String
+                                        body.addFormDataPart(name, value)
+                                    }
+                                    proxyRequest.post(body.build())
+                                }
+                            }
+                            val okHttpClient = useHttpClientBuilder().build()
+                            val response = okHttpClient.newCall(proxyRequest.build()).execute()
+                            val body = response.body!!
+                            val contentType = body.contentType()
+                            val mimeType = if (contentType != null) {"${contentType.type}/${contentType.subtype}"} else { "text/plain" }
+                            val reasonPhrase = response.message.ifEmpty { response.code.toString() }
+                            val headersMap = response.headers.toMap()
+                            val webResourceResponse = WebResourceResponse(
+                                mimeType,
+                                "utf-8",
+                                response.code,
+                                reasonPhrase,
+                                headersMap,
+                                body.byteStream()
+                            )
+                            return webResourceResponse;
+                        } catch (e: Exception) {
+                            Constant.LOG.add("[intercept] ${request.url} failed, reason: ${e.message}")
+                        }
+                    }
+                    return super.shouldInterceptRequest(view, request);
+                }
+
                 override fun onPageStarted(view: WebView, url: String?, favicon: Bitmap?) {
                     super.onPageStarted(view, url, favicon)
                     loading = true
@@ -139,6 +214,9 @@ fun WebScreen(url: String, onUrlLoaded: ((String?) -> Unit)? = null) {
                     super.onPageFinished(view, url)
                     loading = false
 
+                    if (Constant.USE_PROXY && Constant.isInDomain(url)) {
+                        maybeInjectAjaxHack(view)
+                    }
                     maybeInjectLocalForage(view, saveDir)
                     gameName =
                         if (Constant.isPlayingGame(url))
@@ -269,7 +347,11 @@ fun WebScreen(url: String, onUrlLoaded: ((String?) -> Unit)? = null) {
         }
         
         LaunchedEffect(url) {
-            navigator.loadUrl(url)
+            activity.webScreenLifeCycleHook.view?.apply {
+                clearCache(true)
+                loadUrl("about:blank")
+                loadUrl(url)
+            }
         }
 
         WebView(
@@ -389,6 +471,38 @@ fun WebScreen(url: String, onUrlLoaded: ((String?) -> Unit)? = null) {
                 .clickable { setOrientation(null) },
         )
     }
+}
+
+val hackBodyTypeKey = "Use-Request-Hack-Body-Type"
+val hackBodyContentKey = "Use-Request-Hack-Body-Content"
+
+fun maybeInjectAjaxHack(view: WebView) {
+    view.evaluateJavascript(
+        """
+            if (!XMLHttpRequest.prototype.__app_injected__) {
+                XMLHttpRequest.prototype._send = XMLHttpRequest.prototype.send;
+                XMLHttpRequest.prototype.send = function (body) {
+                    if (body) {
+                        if (typeof body === 'string') {
+                            this.setRequestHeader("$hackBodyTypeKey", "string");
+                            this.setRequestHeader("$hackBodyContentKey", body);
+                        } else if (body instanceof FormData) {
+                            const formData = [];
+                            body.forEach((value, key) => {
+                                if (typeof value === "string") {
+                                    formData.push([key, value]);
+                                }
+                            });
+                            this.setRequestHeader("$hackBodyTypeKey", "FormData");
+                            this.setRequestHeader("$hackBodyContentKey", JSON.stringify(formData));
+                        }
+                    }
+                    this._send(body);
+                };
+                XMLHttpRequest.prototype.__app_injected__ = true;
+            }
+        """.trimIndent()
+    ) {}
 }
 
 fun maybeInjectLocalForage(view: WebView, saveDir: File) {

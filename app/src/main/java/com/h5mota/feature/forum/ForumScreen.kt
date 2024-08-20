@@ -2,7 +2,7 @@ package com.h5mota.feature.forum
 
 import androidx.compose.runtime.Composable
 import com.h5mota.core.component.WebScreen
-import com.h5mota.ui.Constant
+import com.h5mota.core.base.Constant
 
 
 @Composable

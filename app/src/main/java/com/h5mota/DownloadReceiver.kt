@@ -10,7 +10,7 @@ import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import androidx.core.content.FileProvider
-import com.h5mota.ui.Constant
+import com.h5mota.core.base.Constant
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileInputStream

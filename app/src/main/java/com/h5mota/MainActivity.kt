@@ -19,9 +19,9 @@ import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.ui.Modifier
 import com.h5mota.core.server.MotaWebServer
 import com.h5mota.core.theme.MotaAndroidTheme
-import com.h5mota.ui.Constant.DIRECTORY
-import com.h5mota.ui.Constant.LOCAL_HOST
-import com.h5mota.ui.Constant.LOCAL_PORT
+import com.h5mota.core.base.Constant.DIRECTORY
+import com.h5mota.core.base.Constant.LOCAL_HOST
+import com.h5mota.core.base.Constant.LOCAL_PORT
 import com.h5mota.ui.MotaApp
 import com.hjq.permissions.OnPermissionCallback
 import com.hjq.permissions.Permission
